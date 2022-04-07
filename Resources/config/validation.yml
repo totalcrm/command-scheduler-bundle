@@ -1,0 +1,15 @@
+namespaces:
+    CommandSchedulerConstraints: TotalCRM\CommandSchedulerBundle\Validator\Constraints\
+
+TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand:
+    properties:
+        cronExpression:
+            - NotBlank: ~
+            - CommandSchedulerConstraints:CronExpression: { message: "commandScheduler.validation.cron" }
+        name:
+            - NotBlank: ~
+        command:
+            - NotBlank: ~
+        priority:
+            - Type: { type: 'integer'}
+

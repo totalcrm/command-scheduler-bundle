@@ -1,0 +1,58 @@
+services:
+    TotalCRM\CommandSchedulerBundle\Controller\DetailController:
+        public: true
+        autowire: true
+        calls:
+            - [setManagerName, ["%totalcrm_command_scheduler.doctrine_manager%"]]
+            - [setTranslator, ["@translator"]]
+        tags: [container.service_subscriber]
+
+    TotalCRM\CommandSchedulerBundle\Controller\ListController:
+        public: true
+        autowire: true
+        calls:
+            - [setManagerName, ["%totalcrm_command_scheduler.doctrine_manager%"]]
+            - [setTranslator, ["@translator"]]
+            - [setLockTimeout, ["%totalcrm_command_scheduler.lock_timeout%"]]
+        tags: [container.service_subscriber]
+
+    TotalCRM\CommandSchedulerBundle\Service\CommandParser:
+        arguments:
+            - "@kernel"
+            - "%totalcrm_command_scheduler.excluded_command_namespaces%"
+            - "%totalcrm_command_scheduler.included_command_namespaces%"
+
+    TotalCRM\CommandSchedulerBundle\Form\Type\CommandChoiceType:
+        autowire: true
+        tags:
+            - { name: form.type, alias: command_choice }
+
+    TotalCRM\CommandSchedulerBundle\Command\ExecuteCommand:
+        arguments:
+            - "@doctrine"
+            - "%totalcrm_command_scheduler.doctrine_manager%"
+            - "%totalcrm_command_scheduler.log_path%"
+        tags: [console.command]
+
+    TotalCRM\CommandSchedulerBundle\Command\MonitorCommand:
+        arguments:
+            - "@doctrine"
+            - "%totalcrm_command_scheduler.doctrine_manager%"
+            - "%totalcrm_command_scheduler.lock_timeout%"
+            - "%totalcrm_command_scheduler.monitor_mail%"
+            - "%totalcrm_command_scheduler.monitor_mail_subject%"
+            - "%totalcrm_command_scheduler.send_ok%"
+        tags: [console.command]
+        
+    TotalCRM\CommandSchedulerBundle\Command\UnlockCommand:
+        arguments:
+            - "@doctrine"
+            - "%totalcrm_command_scheduler.doctrine_manager%"
+            - "%totalcrm_command_scheduler.lock_timeout%"
+        tags: [console.command]
+
+    TotalCRM\CommandSchedulerBundle\Command\StartSchedulerCommand:
+        tags: [console.command]
+
+    TotalCRM\CommandSchedulerBundle\Command\StopSchedulerCommand:
+        tags: [console.command]
