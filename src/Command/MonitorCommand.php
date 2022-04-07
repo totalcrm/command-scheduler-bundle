@@ -100,7 +100,7 @@ class MonitorCommand extends Command
         }
 
         // Fist, get all failed or potential timeout
-        $failedCommands = $this->em->getRepository('TotalCRMCommandSchedulerBundle:ScheduledCommand')
+        $failedCommands = $this->em->getRepository('CommandSchedulerBundle:ScheduledCommand')
             ->findFailedAndTimeoutCommands($this->lockTimeout);
 
         // Commands in error

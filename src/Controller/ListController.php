@@ -26,23 +26,20 @@ class ListController extends BaseController
     }
 
     /**
-     * @return Response
+     * @return JsonResponse
      */
-    public function indexAction()
+    public function indexAction(): JsonResponse
     {
-        $scheduledCommands = $this->getDoctrineManager()->getRepository(
-            'TotalCRMCommandSchedulerBundle:ScheduledCommand'
-        )->findAll();
+        $scheduledCommands = $this->getDoctrineManager()->getRepository('CommandSchedulerBundle:ScheduledCommand')->findAll();
 
-        return $this->render(
-            '@TotalCRMCommandScheduler/List/index.html.twig',
-            ['scheduledCommands' => $scheduledCommands]
-        );
+        $response = new JsonResponse();
+        $response->setContent(json_encode($scheduledCommands));
+
+        return $response;
     }
 
     /**
      * @param $id
-     *
      * @return Response
      */
     public function removeAction($id)
@@ -54,8 +51,7 @@ class ListController extends BaseController
         $entityManager->flush();
 
         // Add a flash message and do a redirect to the list
-        $this->get('session')->getFlashBag()
-            ->add('success', $this->translator->trans('flash.deleted', [], 'TotalCRMCommandScheduler'));
+        $this->get('session')->getFlashBag()->add('success', $this->translator->trans('flash.deleted', [], 'CommandScheduler'));
 
         return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
     }
@@ -90,7 +86,7 @@ class ListController extends BaseController
 
         // Add a flash message and do a redirect to the list
         $this->get('session')->getFlashBag()
-            ->add('success', $this->translator->trans('flash.execute', [], 'TotalCRMCommandScheduler'));
+            ->add('success', $this->translator->trans('flash.execute', [], 'CommandScheduler'));
 
         if ($request->query->has('referer')) {
             return $this->redirect($request->getSchemeAndHttpHost().urldecode($request->query->get('referer')));
@@ -114,7 +110,7 @@ class ListController extends BaseController
 
         // Add a flash message and do a redirect to the list
         $this->get('session')->getFlashBag()
-            ->add('success', $this->translator->trans('flash.unlocked', [], 'TotalCRMCommandScheduler'));
+            ->add('success', $this->translator->trans('flash.unlocked', [], 'CommandScheduler'));
 
         if ($request->query->has('referer')) {
             return $this->redirect($request->getSchemeAndHttpHost().urldecode($request->query->get('referer')));

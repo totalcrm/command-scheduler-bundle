@@ -116,7 +116,7 @@ class ScheduledCommandType extends AbstractType
             [
                 'data_class' => ScheduledCommand::class,
                 'wrapper_attr' => 'default_wrapper',
-                'translation_domain' => 'TotalCRMCommandScheduler',
+                'translation_domain' => 'CommandScheduler',
             ]
         );
     }

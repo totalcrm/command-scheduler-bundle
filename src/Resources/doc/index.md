@@ -46,7 +46,7 @@ Now, you have to register the routes provided by the bundle :
 # app/config/routing.yml
 
 totalcrm_command_scheduler:
-    resource: "@TotalCRMCommandSchedulerBundle/Resources/config/routing.yml"
+    resource: "@CommandSchedulerBundle/Resources/config/routing.yml"
     prefix:   /
 ```
 
@@ -61,7 +61,7 @@ doctrine:
             default:
                 mappings:
                     YourBundle: ~
-                    TotalCRMCommandSchedulerBundle: ~
+                    CommandSchedulerBundle: ~
 ```
 
 If you wish to use default texts provided in this bundle, you have to make sure you have translator enabled in your config.
@@ -136,7 +136,7 @@ Feel free to override it (especially `log_path`) in your `config.yml` file.
 If you'd like to alter the navigation bar shown on `http://{your-app-root}/command-scheduler/list` you'll want to override the navbar template.
 This can easily be done by using standard overrides in Symfony, as described [here](http://symfony.com/doc/current/templating/overriding.html).
 
-In your project, you'll want to copy the `Navbar:navbar:html.twig` template into `app/Resources/TotalCRMCommandSchedulerBundle/views/Navbar/navbar.html.twig`.  Any changes to the file in this location will take precedence over the bundle's template file.
+In your project, you'll want to copy the `Navbar:navbar:html.twig` template into `app/Resources/CommandSchedulerBundle/views/Navbar/navbar.html.twig`.  Any changes to the file in this location will take precedence over the bundle's template file.
 
 ### 6 - EasyAdmin integration
 
@@ -146,7 +146,7 @@ If you want to manage your scheduled commands via [EasyAdmin](https://github.com
 easy_admin:
   entities:
     Cron:
-      translation_domain: 'TotalCRMCommandScheduler'
+      translation_domain: 'CommandScheduler'
       label: 'list.title'
       class: TotalCRM\CommandScheduler\Entity\ScheduledCommand
       list:

@@ -29,7 +29,7 @@ class DetailController extends BaseController
         }
 
         return $this->render(
-            '@TotalCRMCommandScheduler/Detail/index.html.twig',
+            '@CommandScheduler/Detail/index.html.twig',
             [
                 'scheduledCommandForm' => $scheduledCommandForm->createView(),
             ]
@@ -105,7 +105,7 @@ class DetailController extends BaseController
 
             // Add a flash message and do a redirect to the list
             $this->get('session')->getFlashBag()
-                ->add('success', $this->translator->trans('flash.success', [], 'TotalCRMCommandScheduler'));
+                ->add('success', $this->translator->trans('flash.success', [], 'CommandScheduler'));
 
             return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
         }
