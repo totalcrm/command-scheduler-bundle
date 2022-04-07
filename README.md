@@ -1,8 +1,6 @@
 CommandSchedulerBundle
 ======================
 
-[![Latest Stable Version](https://poser.pugx.org/totalcrm/command-scheduler-bundle/v/stable)](https://packagist.org/packages/totalcrm/command-scheduler-bundle)
-
 This bundle will allow you to easily manage scheduling for Symfony's console commands (native or not) with cron expression.
 
 ## Features
@@ -21,13 +19,6 @@ This bundle will allow you to easily manage scheduling for Symfony's console com
 - Translated in french, english, german and spanish
 - An [EasyAdmin](https://github.com/EasyCorp/EasyAdminBundle) configuration template available [here](Resources/doc/index.md#6---easyadmin-integration)
 - **Beta** - Handle commands with a deamon (unix only) if you don't want to use a cronjob
-
-## Screenshots
-![list](Resources/doc/images/scheduled-list.png)
-
-![new](Resources/doc/images/new-schedule.png)
-
-![new2](Resources/doc/images/command-list.png)
 
 ## Documentation
 
