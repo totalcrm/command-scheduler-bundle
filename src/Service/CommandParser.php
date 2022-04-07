@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Service;
+namespace TotalCRM\CommandScheduler\Service;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;

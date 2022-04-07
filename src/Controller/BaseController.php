@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Controller;
+namespace TotalCRM\CommandScheduler\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

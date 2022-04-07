@@ -1,10 +1,10 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Fixtures\ORM;
+namespace TotalCRM\CommandScheduler\Fixtures\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 
 /**
  * Class LoadScheduledCommandData.

@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Entity;
+namespace TotalCRM\CommandScheduler\Entity;
 
 /**
  * Entity ScheduledCommand.

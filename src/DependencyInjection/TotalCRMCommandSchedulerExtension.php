@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\DependencyInjection;
+namespace TotalCRM\CommandScheduler\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

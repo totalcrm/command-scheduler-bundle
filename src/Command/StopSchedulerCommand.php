@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Command;
+namespace TotalCRM\CommandScheduler\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

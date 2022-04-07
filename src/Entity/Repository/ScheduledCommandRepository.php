@@ -1,10 +1,10 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Entity\Repository;
+namespace TotalCRM\CommandScheduler\Entity\Repository;
 
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityRepository;
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 
 /**
  * Class ScheduledCommandRepository.
@@ -58,7 +58,7 @@ class ScheduledCommandRepository extends EntityRepository
     /**
      * @param int|bool $lockTimeout
      *
-     * @return array|\TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand[]
+     * @return array|\TotalCRM\CommandScheduler\Entity\ScheduledCommand[]
      */
     public function findFailedAndTimeoutCommands($lockTimeout = false)
     {

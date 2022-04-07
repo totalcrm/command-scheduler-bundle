@@ -1,9 +1,9 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Command;
+namespace TotalCRM\CommandScheduler\Command;
 
 use Cron\CronExpression;
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * Class ExecuteCommand
- * @package TotalCRM\CommandSchedulerBundle\Command
+ * @package TotalCRM\CommandScheduler\Command
  */
 class ExecuteCommand extends Command
 {

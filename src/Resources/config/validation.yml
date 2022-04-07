@@ -1,7 +1,7 @@
 namespaces:
-    CommandSchedulerConstraints: TotalCRM\CommandSchedulerBundle\Validator\Constraints\
+    CommandSchedulerConstraints: TotalCRM\CommandScheduler\Validator\Constraints\
 
-TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand:
+TotalCRM\CommandScheduler\Entity\ScheduledCommand:
     properties:
         cronExpression:
             - NotBlank: ~

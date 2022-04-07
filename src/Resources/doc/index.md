@@ -36,7 +36,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
-        new TotalCRM\CommandSchedulerBundle\TotalCRMCommandSchedulerBundle(),
+        new TotalCRM\CommandScheduler\CommandSchedulerBundle(),
     );
 }
 ```
@@ -148,7 +148,7 @@ easy_admin:
     Cron:
       translation_domain: 'TotalCRMCommandScheduler'
       label: 'list.title'
-      class: TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand
+      class: TotalCRM\CommandScheduler\Entity\ScheduledCommand
       list:
         title: "list.title"
         fields:
@@ -167,7 +167,7 @@ easy_admin:
       form:
         fields:
           - { property: 'name', label: 'detail.name' }
-          - { property: 'command', label: 'detail.command', type: 'TotalCRM\CommandSchedulerBundle\Form\Type\CommandChoiceType' }
+          - { property: 'command', label: 'detail.command', type: 'TotalCRM\CommandScheduler\Form\Type\CommandChoiceType' }
           - { property: 'arguments', label: 'detail.arguments' }
           - { property: 'cronExpression', label: 'detail.cronExpression' }
           - { property: 'priority', label: 'detail.priority' }
@@ -241,6 +241,3 @@ The call returns a JSON object with either HTTP 200 and an empty array (everythi
 
 For "internal" monitoring of jobs there is also a command "scheduler:monitor" which does the same check as the monitor call before except it sends emails to an arbitrary number of receivers (if the server allows sending mails with the "mail" command).
 As some kind of "self-monitoring" job the monitor command can be configured to send emails to all receivers if everything's ok - if there is no mail at all a problem occured.
-
-
-For any comments, questions, or bug report, use the  [Github issue tracker](https://github.com/J-Mose/CommandSchedulerBundle/issues).

@@ -1,8 +1,8 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Form\Type;
+namespace TotalCRM\CommandScheduler\Form\Type;
 
-use TotalCRM\CommandSchedulerBundle\Service\CommandParser;
+use TotalCRM\CommandScheduler\Service\CommandParser;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Command;
+namespace TotalCRM\CommandScheduler\Command;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class MonitorCommand
- * @package TotalCRM\CommandSchedulerBundle\Command
+ * @package TotalCRM\CommandScheduler\Command
  */
 class MonitorCommand extends Command
 {

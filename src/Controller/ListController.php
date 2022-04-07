@@ -1,8 +1,8 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Controller;
+namespace TotalCRM\CommandScheduler\Controller;
 
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

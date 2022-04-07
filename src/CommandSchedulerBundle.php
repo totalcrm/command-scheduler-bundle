@@ -1,8 +1,8 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle;
+namespace TotalCRM\CommandScheduler;
 
-use TotalCRM\CommandSchedulerBundle\DependencyInjection\TotalCRMCommandSchedulerExtension;
+use TotalCRM\CommandScheduler\DependencyInjection\TotalCRMCommandSchedulerExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class CommandSchedulerBundle extends Bundle

@@ -1,9 +1,9 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Controller;
+namespace TotalCRM\CommandScheduler\Controller;
 
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
-use TotalCRM\CommandSchedulerBundle\Form\Type\ScheduledCommandType;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Form\Type\ScheduledCommandType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

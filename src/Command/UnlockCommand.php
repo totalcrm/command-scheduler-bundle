@@ -1,8 +1,8 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Command;
+namespace TotalCRM\CommandScheduler\Command;
 
-use TotalCRM\CommandSchedulerBundle\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

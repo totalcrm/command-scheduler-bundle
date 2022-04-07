@@ -1,6 +1,6 @@
 <?php
 
-namespace TotalCRM\CommandSchedulerBundle\Validator\Constraints;
+namespace TotalCRM\CommandScheduler\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
