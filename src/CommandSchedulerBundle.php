@@ -5,7 +5,7 @@ namespace TotalCRM\CommandSchedulerBundle;
 use TotalCRM\CommandSchedulerBundle\DependencyInjection\TotalCRMCommandSchedulerExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class TotalCRMCommandSchedulerBundle extends Bundle
+class CommandSchedulerBundle extends Bundle
 {
     /**
      * {@inheritdoc}

@@ -22,7 +22,7 @@ This bundle will allow you to easily manage scheduling for Symfony's console com
 
 ## Documentation
 
-See the [documentation here](Resources/doc/index.md).
+See the [documentation here](src/Resources/doc/index.md).
 
 ## License
 

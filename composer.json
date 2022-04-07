@@ -40,7 +40,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TotalCRM\\CommandSchedulerBundle\\": ""
+            "TotalCRM\\CommandScheduler\\": "src/"
         }
     }
 }
