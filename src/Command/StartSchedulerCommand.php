@@ -2,6 +2,7 @@
 
 namespace TotalCRM\CommandScheduler\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,8 +11,8 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Code originally taken from https://github.com/Cron/Symfony-Bundle/blob/2.1.0/Command/CronStartCommand.php
- * License: MIT (according to https://github.com/Cron/Symfony-Bundle/blob/2.1.0/LICENSE)
+ * Class StartSchedulerCommand
+ * @package TotalCRM\CommandScheduler\Command
  */
 class StartSchedulerCommand extends Command
 {
@@ -28,9 +29,12 @@ class StartSchedulerCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('blocking')) {
             $output->writeln(sprintf('<info>%s</info>', 'Starting command scheduler in blocking mode.'));
@@ -66,6 +70,11 @@ class StartSchedulerCommand extends Command
         return 0;
     }
 
+    /**
+     * @param OutputInterface $output
+     * @param $pidFile
+     * @throws Exception
+     */
     private function scheduler(OutputInterface $output, $pidFile)
     {
         $input = new ArrayInput([]);

@@ -2,8 +2,8 @@
 
 namespace TotalCRM\CommandScheduler\Controller;
 
-use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
-use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -11,9 +11,13 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use DateTime;
 
 /**
- * Class ListController.
+ * Class ListController
+ * @package TotalCRM\CommandScheduler\Controller
  */
 class ListController extends BaseController
 {
@@ -32,6 +36,7 @@ class ListController extends BaseController
 
     /**
      * @return JsonResponse
+     * @throws ExceptionInterface
      */
     public function indexAction(): JsonResponse
     {
@@ -43,7 +48,7 @@ class ListController extends BaseController
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoders);
-        $defaultTimezone = (new \DateTime())->getTimezone();
+        $defaultTimezone = (new DateTime())->getTimezone();
 
         $scheduledCommandsNormalize = $serializer->normalize($scheduledCommands, null, [
             DateTimeNormalizer::TIMEZONE_KEY => $defaultTimezone
@@ -132,6 +137,7 @@ class ListController extends BaseController
     public function monitorAction()
     {
         $em = $this->getDoctrineManager();
+        /** @var ScheduledCommand[] $failedCommands */
         $failedCommands = $em->getRepository(ScheduledCommand::class)->findFailedAndTimeoutCommands($this->lockTimeout);
 
         $results = [];

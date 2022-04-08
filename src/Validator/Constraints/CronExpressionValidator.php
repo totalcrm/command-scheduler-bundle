@@ -7,7 +7,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Class CronExpressionValidator.
+ * Class CronExpressionValidator
+ * @package TotalCRM\CommandScheduler\Validator\Constraints
  */
 class CronExpressionValidator extends ConstraintValidator
 {

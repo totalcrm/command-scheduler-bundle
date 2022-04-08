@@ -5,7 +5,8 @@ namespace TotalCRM\CommandScheduler\Entity;
 use DateTime;
 
 /**
- * Entity ScheduledCommand.
+ * Class ScheduledCommand
+ * @package TotalCRM\CommandScheduler\Entity
  */
 class ScheduledCommand
 {

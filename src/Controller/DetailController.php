@@ -2,14 +2,15 @@
 
 namespace TotalCRM\CommandScheduler\Controller;
 
-use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
-use TotalCRM\CommandScheduler\Form\Type\ScheduledCommandType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Form\Type\ScheduledCommandType;
 
 /**
- * Class DetailController.
+ * Class DetailController
+ * @package TotalCRM\CommandScheduler\Controller
  */
 class DetailController extends BaseController
 {

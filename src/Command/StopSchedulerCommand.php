@@ -7,14 +7,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Code originally taken from https://github.com/Cron/Symfony-Bundle/blob/2.1.0/Command/CronStopCommand.php
- * License: MIT (according to https://github.com/Cron/Symfony-Bundle/blob/2.1.0/LICENSE)
+ * Class StopSchedulerCommand
+ * @package TotalCRM\CommandScheduler\Command
  */
 class StopSchedulerCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('scheduler:stop')
@@ -22,9 +19,11 @@ class StopSchedulerCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pidFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.StartSchedulerCommand::PID_FILE;
         if (!file_exists($pidFile)) {

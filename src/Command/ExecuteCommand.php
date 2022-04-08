@@ -4,15 +4,15 @@ namespace TotalCRM\CommandScheduler\Command;
 
 use Cron\CronExpression;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\Persistence\Mapping\MappingException;
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\BufferedOutput;
-use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
-use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +20,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
 
 /**
  * Class ExecuteCommand
@@ -104,11 +107,8 @@ class ExecuteCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
-     * @throws Exception
-     * @throws MappingException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws TransactionRequiredException
+     *
+     * @throws Exception|MappingException|OptimisticLockException|TransactionRequiredException|\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -127,13 +127,15 @@ class ExecuteCommand extends Command
             return 1;
         }
 
+        /** @var ScheduledCommandRepository $commandRepository */
+        $commandRepository = $this->em->getRepository(ScheduledCommand::class);
         /** @var ScheduledCommand[] $commands */
-        $commands = $this->em->getRepository(ScheduledCommand::class)->findEnabledCommand();
+        $commands = $commandRepository->findEnabledCommand();
 
         $noneExecution = true;
         /** @var ScheduledCommand $command */
         foreach ($commands as $command) {
-            $this->em->refresh($this->em->find(ScheduledCommand::class, $command));
+            $this->em->refresh($commandRepository->find($command->getId()));
             if ($command->isDisabled() || $command->isLocked()) {
                 continue;
             }
@@ -157,7 +159,7 @@ class ExecuteCommand extends Command
                 $output->writeln(
                     'Command <comment>'.$command->getCommand().
                     '</comment> should be executed - last execution : <comment>'.
-                    $command->getLastExecution()->format(\DateTimeInterface::ATOM).'.</comment>'
+                    $command->getLastExecution()->format(DateTimeInterface::ATOM).'.</comment>'
                 );
 
                 if (!$input->getOption('dump')) {
@@ -219,7 +221,7 @@ class ExecuteCommand extends Command
         try {
             /** @var Command $command */
             $command = $this->getApplication()->find($scheduledCommand->getCommand());
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $scheduledCommand->setLastReturnCode(-1);
             $output->writeln('<error>Cannot find '.$scheduledCommand->getCommand().'</error>');
 

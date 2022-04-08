@@ -11,7 +11,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Class CommandChoiceList.
+ * Class CommandParser
+ * @package TotalCRM\CommandScheduler\Service
  */
 class CommandParser
 {

@@ -5,11 +5,13 @@ namespace TotalCRM\CommandScheduler;
 use TotalCRM\CommandScheduler\DependencyInjection\CommandSchedulerExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Class CommandSchedulerBundle
+ * @package TotalCRM\CommandScheduler
+ */
 class CommandSchedulerBundle extends Bundle
 {
     /**
-     * {@inheritdoc}
-     *
      * @return CommandSchedulerExtension
      */
     public function getContainerExtension()
@@ -20,7 +22,7 @@ class CommandSchedulerBundle extends Bundle
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     protected function getContainerExtensionClass()
     {

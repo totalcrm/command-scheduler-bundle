@@ -5,7 +5,8 @@ namespace TotalCRM\CommandScheduler\Entity;
 use DateTime;
 
 /**
- * Entity ScheduledHistory.
+ * Class ScheduledHistory
+ * @package TotalCRM\CommandScheduler\Entity
  */
 class ScheduledHistory
 {

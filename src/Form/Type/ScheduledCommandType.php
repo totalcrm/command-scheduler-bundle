@@ -13,7 +13,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ScheduledCommandType.
+ * Class ScheduledCommandType
+ * @package TotalCRM\CommandScheduler\Form\Type
  */
 class ScheduledCommandType extends AbstractType
 {

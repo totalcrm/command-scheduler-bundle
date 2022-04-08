@@ -2,11 +2,12 @@
 
 namespace TotalCRM\CommandScheduler\Controller;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * Class BaseController.
+ * Class BaseController
+ * @package TotalCRM\CommandScheduler\Controller
  */
 abstract class BaseController extends AbstractController
 {

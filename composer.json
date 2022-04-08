@@ -20,7 +20,9 @@
         "symfony/framework-bundle": "^3.4|^4.3|^5.0",
         "symfony/form": "^3.4|^4.3|^5.0",
         "symfony/validator": "^3.4|^4.3|^5.0",
-        "ext-simplexml": "*"
+        "symfony/serializer": "^3.4|^4.3|^5.0",
+        "ext-simplexml": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "ext-pcntl": "*",

@@ -2,6 +2,12 @@
 
 namespace TotalCRM\CommandScheduler\Command;
 
+use DateInterval;
+use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Exception;
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
@@ -11,14 +17,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to unlock one or all scheduled commands that have surpassed the lock timeout.
- *
- * @author  Marcel Pfeiffer <m.pfeiffer@strucnamics.de>
+ * Class UnlockCommand
+ * @package TotalCRM\CommandScheduler\Command
  */
 class UnlockCommand extends Command
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
@@ -86,7 +91,8 @@ class UnlockCommand extends Command
         $this->unlockAll = $input->getOption('all');
         $this->scheduledCommandName = $input->getArgument('name');
 
-        $this->lockTimeout = $input->getOption('lock-timeout', null);
+        $this->lockTimeout = $input->getOption('lock-timeout') ?: null;
+
         if (null === $this->lockTimeout) {
             $this->lockTimeout = $this->defaultLockTimeout;
         } else {
@@ -97,10 +103,12 @@ class UnlockCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return int|void|null
+     * @return int
+     * @throws OptimisticLockException
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -110,6 +118,7 @@ class UnlockCommand extends Command
             return 1;
         }
 
+        /** @var ScheduledCommandRepository $repository */
         $repository = $this->em->getRepository(ScheduledCommand::class);
 
         if (true === $this->unlockAll) {
@@ -118,6 +127,7 @@ class UnlockCommand extends Command
                 $this->unlock($failedCommand, $output);
             }
         } else {
+            /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $repository->findOneBy(['name' => $this->scheduledCommandName, 'disabled' => false]);
             if (null === $scheduledCommand) {
                 $output->writeln(
@@ -140,7 +150,9 @@ class UnlockCommand extends Command
     /**
      * @param ScheduledCommand $command command to be unlocked
      *
+     * @param OutputInterface $output
      * @return bool true if unlock happened
+     * @throws Exception
      */
     protected function unlock(ScheduledCommand $command, OutputInterface $output)
     {
@@ -152,8 +164,8 @@ class UnlockCommand extends Command
 
         if (false !== $this->lockTimeout &&
             null !== $command->getLastExecution() &&
-            $command->getLastExecution() >= (new \DateTime())->sub(
-                new \DateInterval(sprintf('PT%dS', $this->lockTimeout))
+            $command->getLastExecution() >= (new DateTime())->sub(
+                new DateInterval(sprintf('PT%dS', $this->lockTimeout))
             )
         ) {
             $output->writeln(

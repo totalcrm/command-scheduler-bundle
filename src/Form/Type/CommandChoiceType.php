@@ -2,13 +2,15 @@
 
 namespace TotalCRM\CommandScheduler\Form\Type;
 
+use Exception;
 use TotalCRM\CommandScheduler\Service\CommandParser;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class CommandChoiceType.
+ * Class CommandChoiceType
+ * @package TotalCRM\CommandScheduler\Form\Type
  */
 class CommandChoiceType extends AbstractType
 {
@@ -27,6 +29,7 @@ class CommandChoiceType extends AbstractType
 
     /**
      * @param OptionsResolver $resolver
+     * @throws Exception
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -38,7 +41,7 @@ class CommandChoiceType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getParent()
     {
