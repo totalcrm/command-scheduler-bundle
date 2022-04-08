@@ -12,32 +12,32 @@ use Exception;
 class ScheduledHistory
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $commandId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $messages;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $error;
 
     /**
-     * @var DateTime
+     * @var DateTime|null
      */
     private $dateExecution;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $returnCode;
 
@@ -51,18 +51,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param $id
+     * @param int|null
      * @return ScheduledHistory
      */
-    public function setId($id)
+    public function setId(?int $id)
     {
         $this->id = $id;
 
@@ -70,18 +70,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getCommandId()
+    public function getCommandId(): ?int
     {
         return $this->commandId;
     }
 
     /**
-     * @param int $commandId
+     * @param int|null $commandId
      * @return ScheduledHistory
      */
-    public function setCommandId($commandId)
+    public function setCommandId(?int $commandId)
     {
         $this->commandId = $commandId;
 
@@ -89,18 +89,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMessages()
+    public function getMessages(): ?string
     {
         return $this->messages;
     }
 
     /**
-     * @param string $messages
+     * @param string|null $messages
      * @return ScheduledHistory
      */
-    public function setMessages($messages)
+    public function setMessages(?string $messages)
     {
         $this->messages = $messages;
 
@@ -108,18 +108,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getDateExecution()
+    public function getDateExecution(): ?DateTime
     {
         return $this->dateExecution;
     }
 
     /**
-     * @param DateTime $dateExecution
+     * @param DateTime|null $dateExecution
      * @return ScheduledHistory
      */
-    public function setDateExecution($dateExecution)
+    public function setDateExecution(?DateTime $dateExecution)
     {
         $this->dateExecution = $dateExecution;
 
@@ -127,18 +127,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getReturnCode()
+    public function getReturnCode(): ?int
     {
         return $this->returnCode;
     }
 
     /**
-     * @param int $returnCode
+     * @param int|null $returnCode
      * @return ScheduledHistory
      */
-    public function setReturnCode($returnCode)
+    public function setReturnCode(?int $returnCode)
     {
         $this->returnCode = $returnCode;
 
@@ -146,18 +146,18 @@ class ScheduledHistory
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getError(): string
+    public function getError(): ?string
     {
         return $this->error;
     }
 
     /**
-     * @param string $error
+     * @param string|null $error
      * @return ScheduledHistory
      */
-    public function setError(string $error): self
+    public function setError(?string $error): self
     {
         $this->error = $error;
 

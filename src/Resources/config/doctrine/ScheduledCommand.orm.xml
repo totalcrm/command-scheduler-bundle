@@ -7,20 +7,22 @@
         <id name="id" type="integer" column="id">
             <generator strategy="IDENTITY" />
         </id>
-        <field name="name" column="name" type="string" length="100" nullable="false" unique="false" />
-        <field name="command" column="command" type="string" length="100" nullable="false" unique="false" />
+        <field name="name" column="name" type="string" length="100" nullable="true" unique="false" />
+        <field name="command" column="command" type="string" length="100" nullable="true" unique="false" />
         <field name="arguments" column="arguments" type="text" nullable="true" unique="false" />
         <field name="description" column="description" type="text" nullable="true" unique="false" />
         <field name="cronExpression" column="cron_expression" type="string" length="100" nullable="true" unique="false" />
-        <field name="lastExecution" column="last_execution" type="datetime" nullable="false" unique="false" />
+        <field name="lastExecution" column="last_execution" type="datetime" nullable="true" unique="false" />
         <field name="lastReturnCode" column="last_return_code" type="integer" nullable="true" unique="false" />
+        <field name="lastMessages" column="last_return_code" type="text" nullable="true" unique="false" />
         <field name="logFile" column="log_file" type="string" length="100" nullable="true" unique="false" />
-        <field name="priority" column="priority" type="integer" nullable="false" unique="false" />
-        <field name="executeImmediately" column="execute_immediately" type="boolean" nullable="false" unique="false" />
-        <field name="disabled" column="disabled" type="boolean" nullable="false" unique="false" />
-        <field name="locked" column="locked" type="boolean" nullable="false" unique="false" />
+        <field name="isHistory" column="history" type="boolean" nullable="true" unique="false" />
+        <field name="priority" column="priority" type="integer" nullable="true" unique="false" />
+        <field name="executeImmediately" column="execute_immediately" type="boolean" nullable="true" unique="false" />
+        <field name="disabled" column="disabled" type="boolean" nullable="true" unique="false" />
+        <field name="locked" column="locked" type="boolean" nullable="true" unique="false" />
         <field name="userId" column="user_id" type="integer" nullable="true" unique="false" />
-        <field name="createdAt" column="created_at" type="datetime" nullable="false" unique="false" />
-        <field name="updatedAt" column="updated_at" type="datetime" nullable="false" unique="false" />
+        <field name="createdAt" column="created_at" type="datetime" nullable="true" unique="false" />
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="true" unique="false" />
     </entity>
 </doctrine-mapping>

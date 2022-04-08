@@ -12,67 +12,77 @@ use Exception;
 class ScheduledCommand
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $command;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $arguments;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cronExpression;
 
     /**
-     * @var DateTime
+     * @var DateTime|null
      */
     private $lastExecution;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $lastReturnCode;
 
     /**
-     * @var string
+     * @var string|null
+     */
+    private $lastMessages;
+
+    /**
+     * @var string|null
      */
     private $logFile;
 
     /**
-     * @var int
+     * @var bool|null
+     */
+    private $isHistory;
+
+    /**
+     * @var int|null
      */
     private $priority;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $executeImmediately;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $disabled;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $locked;
 
@@ -102,18 +112,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param $id
+     * @param int|null
      * @return ScheduledCommand
      */
-    public function setId($id): self
+    public function setId(?int $id): self
     {
         $this->id = $id;
 
@@ -121,18 +131,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return ScheduledCommand
      */
-    public function setName($name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -140,18 +150,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCommand()
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
     /**
-     * @param string $command
+     * @param string|null $command
      * @return ScheduledCommand
      */
-    public function setCommand($command): self
+    public function setCommand(?string $command): self
     {
         $this->command = $command;
 
@@ -159,18 +169,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getArguments()
+    public function getArguments(): ?string
     {
         return $this->arguments;
     }
 
     /**
-     * @param string $arguments
+     * @param string|null $arguments
      * @return ScheduledCommand
      */
-    public function setArguments($arguments): self
+    public function setArguments(?string $arguments): self
     {
         $this->arguments = $arguments;
 
@@ -178,18 +188,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->arguments;
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      * @return ScheduledCommand
      */
-    public function setDescription($description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -197,18 +207,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCronExpression()
+    public function getCronExpression(): ?string
     {
         return $this->cronExpression;
     }
 
     /**
-     * @param string $cronExpression
+     * @param string|null $cronExpression
      * @return ScheduledCommand
      */
-    public function setCronExpression($cronExpression): self
+    public function setCronExpression(?string $cronExpression): self
     {
         $this->cronExpression = $cronExpression;
 
@@ -216,15 +226,15 @@ class ScheduledCommand
     }
 
     /**
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getLastExecution()
+    public function getLastExecution(): ?DateTime
     {
         return $this->lastExecution;
     }
 
     /**
-     * @param DateTime $lastExecution
+     * @param DateTime|null $lastExecution
      * @return ScheduledCommand
      */
     public function setLastExecution($lastExecution): self
@@ -235,18 +245,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLogFile()
+    public function getLogFile(): ?string
     {
         return $this->logFile;
     }
 
     /**
-     * @param string $logFile
+     * @param string|null $logFile
      * @return ScheduledCommand
      */
-    public function setLogFile($logFile): self
+    public function setLogFile(?string $logFile): self
     {
         $this->logFile = $logFile;
 
@@ -254,18 +264,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getLastReturnCode()
+    public function getLastReturnCode(): ?int
     {
         return $this->lastReturnCode;
     }
 
     /**
-     * @param int $lastReturnCode
+     * @param int|null $lastReturnCode
      * @return ScheduledCommand
      */
-    public function setLastReturnCode($lastReturnCode): self
+    public function setLastReturnCode(?int $lastReturnCode): self
     {
         $this->lastReturnCode = $lastReturnCode;
 
@@ -273,18 +283,18 @@ class ScheduledCommand
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getPriority()
+    public function getPriority(): ?int
     {
         return $this->priority;
     }
 
     /**
-     * @param int $priority
+     * @param int|null $priority
      * @return ScheduledCommand
      */
-    public function setPriority($priority): self
+    public function setPriority(?int $priority): self
     {
         $this->priority = $priority;
 
@@ -292,17 +302,17 @@ class ScheduledCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isExecuteImmediately()
+    public function isExecuteImmediately(): ?bool
     {
         return $this->executeImmediately;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getExecuteImmediately()
+    public function getExecuteImmediately(): ?bool
     {
         return $this->executeImmediately;
     }
@@ -319,26 +329,26 @@ class ScheduledCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isDisabled()
+    public function isDisabled(): ?bool
     {
         return $this->disabled;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getDisabled()
+    public function getDisabled(): ?bool
     {
         return $this->disabled;
     }
 
     /**
-     * @param bool $disabled
+     * @param bool|null $disabled
      * @return ScheduledCommand
      */
-    public function setDisabled($disabled): self
+    public function setDisabled(?bool $disabled): self
     {
         $this->disabled = $disabled;
 
@@ -346,26 +356,26 @@ class ScheduledCommand
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isLocked()
+    public function isLocked(): ?bool
     {
         return $this->locked;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getLocked()
+    public function getLocked(): ?bool
     {
         return $this->locked;
     }
 
     /**
-     * @param bool $locked
+     * @param bool|null $locked
      * @return ScheduledCommand
      */
-    public function setLocked($locked): self
+    public function setLocked(?bool $locked): self
     {
         $this->locked = $locked;
 
@@ -427,5 +437,43 @@ class ScheduledCommand
     public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isHistory(): ?bool
+    {
+        return $this->isHistory;
+    }
+
+    /**
+     * @param bool|null $isHistory
+     * @return ScheduledCommand
+     */
+    public function setIsHistory(?bool $isHistory): self
+    {
+        $this->isHistory = $isHistory;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastMessages(): ?string
+    {
+        return $this->lastMessages;
+    }
+
+    /**
+     * @param string|null $lastMessages
+     * @return ScheduledCommand
+     */
+    public function setLastMessages(?string $lastMessages): self
+    {
+        $this->lastMessages = $lastMessages;
+
+        return $this;
     }
 }
