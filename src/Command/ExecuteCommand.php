@@ -18,6 +18,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
@@ -216,6 +217,7 @@ class ExecuteCommand extends Command
             return;
         }
 
+        /** @var ScheduledCommand $scheduledCommand */
         $scheduledCommand = $this->em->find(ScheduledCommand::class, $scheduledCommand);
 
         try {
@@ -240,12 +242,11 @@ class ExecuteCommand extends Command
             $input->setInteractive(false);
         }
 
-        // Use a StreamOutput or NullOutput to redirect write() and writeln() in a log file
-        if (false === $this->logPath || empty($scheduledCommand->getLogFile())) {
-            /** @var BufferedOutput $logOutput */
-            $logOutput = new BufferedOutput();
-        } else {
-            /** @var StreamOutput $logOutput */
+        /** @var BufferedOutput $logBufferedOutput */
+        $logBufferedOutput = new BufferedOutput();
+
+        if ($this->logPath && $scheduledCommand->getLogFile()) {
+            /** @var StreamOutput $logStreamOutput */
             $logOutput = new StreamOutput(
                 fopen(
                     $this->logPath.$scheduledCommand->getLogFile(),
@@ -253,15 +254,18 @@ class ExecuteCommand extends Command
                     false
                 ), $this->commandsVerbosity
             );
+        } else {
+            /** @var NullOutput $logStreamOutput */
+            $logOutput = new NullOutput();
         }
         
         // Execute command and get return code
         try {
             $output->writeln('<info>Execute</info> : <comment>'.$scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
-            $result = $command->run($input, $logOutput);
+            $result = $command->run($input, $logBufferedOutput);
         } catch (\Exception $e) {
-            $logOutput->writeln($e->getMessage());
-            $logOutput->writeln($e->getTraceAsString());
+            $logBufferedOutput->writeln($e->getMessage());
+            $logBufferedOutput->writeln($e->getTraceAsString());
             $result = -1;
         }
 
@@ -270,22 +274,27 @@ class ExecuteCommand extends Command
             $this->em = $this->em->create($this->em->getConnection(), $this->em->getConfiguration());
         }
 
+        $messages = $logBufferedOutput->fetch();
+        $logOutput->write($messages);
+
         $scheduledCommand
-            ->setLastReturnCode($result)
-            ->setLocked(false)
+            ->setLastMessages($messages)
+            ->setLastReturnCode((int)$result)
             ->setExecuteImmediately(false)
+            ->setLocked(false)
         ;
         $this->em->persist($scheduledCommand);
 
-        $messages = $logOutput->fetch();
-        $scheduledHistory = new ScheduledHistory();
-        $scheduledHistory
-            ->setDateExecution(new DateTime())
-            ->setCommandId($scheduledCommand->getId())
-            ->setReturnCode($result)
-            ->setMessages($messages)
-        ;
-        $this->em->persist($scheduledHistory);
+        if ($scheduledCommand->isHistory()) {
+            $scheduledHistory = new ScheduledHistory();
+            $scheduledHistory
+                ->setDateExecution(new DateTime())
+                ->setCommandId($scheduledCommand->getId())
+                ->setReturnCode($result)
+                ->setMessages($messages)
+            ;
+            $this->em->persist($scheduledHistory);
+        }
 
         $this->em->flush();
 
