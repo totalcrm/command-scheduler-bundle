@@ -3,13 +3,21 @@
 namespace TotalCRM\CommandScheduler\Command;
 
 use Cron\CronExpression;
+use DateTime;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\TransactionRequiredException;
+use Doctrine\Persistence\Mapping\MappingException;
+use Symfony\Component\Console\Output\BufferedOutput;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
+use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -20,7 +28,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 class ExecuteCommand extends Command
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
@@ -69,7 +77,8 @@ class ExecuteCommand extends Command
             ->setDescription('Execute scheduled commands')
             ->addOption('dump', null, InputOption::VALUE_NONE, 'Display next execution')
             ->addOption('no-output', null, InputOption::VALUE_NONE, 'Disable output message from scheduler')
-            ->setHelp('This class is the entry point to execute all scheduled command');
+            ->setHelp('This class is the entry point to execute all scheduled command')
+        ;
     }
 
     /**
@@ -91,10 +100,15 @@ class ExecuteCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int
+     * @throws Exception
+     * @throws MappingException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -113,19 +127,21 @@ class ExecuteCommand extends Command
             return 1;
         }
 
+        /** @var ScheduledCommand[] $commands */
         $commands = $this->em->getRepository(ScheduledCommand::class)->findEnabledCommand();
 
         $noneExecution = true;
+        /** @var ScheduledCommand $command */
         foreach ($commands as $command) {
             $this->em->refresh($this->em->find(ScheduledCommand::class, $command));
             if ($command->isDisabled() || $command->isLocked()) {
                 continue;
             }
 
-            /** @var ScheduledCommand $command */
+            /** @var CronExpression $cron */
             $cron = CronExpression::factory($command->getCronExpression());
             $nextRunDate = $cron->getNextRunDate($command->getLastExecution());
-            $now = new \DateTime();
+            $now = new DateTime();
 
             if ($command->isExecuteImmediately()) {
                 $noneExecution = false;
@@ -159,30 +175,33 @@ class ExecuteCommand extends Command
 
     /**
      * @param ScheduledCommand $scheduledCommand
-     * @param OutputInterface  $output
-     * @param InputInterface   $input
+     * @param OutputInterface $output
+     * @param InputInterface $input
+     * @throws ORMException|OptimisticLockException|TransactionRequiredException|Exception|MappingException
      */
     private function executeCommand(ScheduledCommand $scheduledCommand, OutputInterface $output, InputInterface $input)
     {
         //reload command from database before every execution to avoid parallel execution
         $this->em->getConnection()->beginTransaction();
+        
         try {
-            $notLockedCommand = $this
-                ->em
-                ->getRepository(ScheduledCommand::class)
-                ->getNotLockedCommand($scheduledCommand);
-            //$notLockedCommand will be locked for avoiding parallel calls: http://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html
+            /** @var ScheduledCommand $notLockedCommand */
+            $notLockedCommand = $this->em->getRepository(ScheduledCommand::class)->getNotLockedCommand($scheduledCommand);
+
             if (null === $notLockedCommand) {
                 throw new \Exception();
             }
 
             $scheduledCommand = $notLockedCommand;
-            $scheduledCommand->setLastExecution(new \DateTime());
+            $scheduledCommand->setLastExecution(new DateTime());
             $scheduledCommand->setLocked(true);
+
             $this->em->persist($scheduledCommand);
             $this->em->flush();
             $this->em->getConnection()->commit();
+
         } catch (\Exception $e) {
+
             $this->em->getConnection()->rollBack();
             $output->writeln(
                 sprintf(
@@ -198,6 +217,7 @@ class ExecuteCommand extends Command
         $scheduledCommand = $this->em->find(ScheduledCommand::class, $scheduledCommand);
 
         try {
+            /** @var Command $command */
             $command = $this->getApplication()->find($scheduledCommand->getCommand());
         } catch (\InvalidArgumentException $e) {
             $scheduledCommand->setLastReturnCode(-1);
@@ -209,6 +229,7 @@ class ExecuteCommand extends Command
         $input = new StringInput(
             $scheduledCommand->getCommand().' '.$scheduledCommand->getArguments().' --env='.$input->getOption('env')
         );
+
         $command->mergeApplicationDefinition();
         $input->bind($command->getDefinition());
 
@@ -219,8 +240,10 @@ class ExecuteCommand extends Command
 
         // Use a StreamOutput or NullOutput to redirect write() and writeln() in a log file
         if (false === $this->logPath || empty($scheduledCommand->getLogFile())) {
-            $logOutput = new NullOutput();
+            /** @var BufferedOutput $logOutput */
+            $logOutput = new BufferedOutput();
         } else {
+            /** @var StreamOutput $logOutput */
             $logOutput = new StreamOutput(
                 fopen(
                     $this->logPath.$scheduledCommand->getLogFile(),
@@ -229,13 +252,10 @@ class ExecuteCommand extends Command
                 ), $this->commandsVerbosity
             );
         }
-
+        
         // Execute command and get return code
         try {
-            $output->writeln(
-                '<info>Execute</info> : <comment>'.$scheduledCommand->getCommand()
-                .' '.$scheduledCommand->getArguments().'</comment>'
-            );
+            $output->writeln('<info>Execute</info> : <comment>'.$scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
             $result = $command->run($input, $logOutput);
         } catch (\Exception $e) {
             $logOutput->writeln($e->getMessage());
@@ -248,10 +268,23 @@ class ExecuteCommand extends Command
             $this->em = $this->em->create($this->em->getConnection(), $this->em->getConfiguration());
         }
 
-        $scheduledCommand->setLastReturnCode($result);
-        $scheduledCommand->setLocked(false);
-        $scheduledCommand->setExecuteImmediately(false);
+        $scheduledCommand
+            ->setLastReturnCode($result)
+            ->setLocked(false)
+            ->setExecuteImmediately(false)
+        ;
         $this->em->persist($scheduledCommand);
+
+        $messages = $logOutput->fetch();
+        $scheduledHistory = new ScheduledHistory();
+        $scheduledHistory
+            ->setDateExecution(new DateTime())
+            ->setCommandId($scheduledCommand->getId())
+            ->setReturnCode($result)
+            ->setMessages($messages)
+        ;
+        $this->em->persist($scheduledHistory);
+
         $this->em->flush();
 
         /*

@@ -2,6 +2,9 @@
 
 namespace TotalCRM\CommandScheduler\Service;
 
+use Exception;
+use InvalidArgumentException;
+use SimpleXMLElement;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -41,7 +44,7 @@ class CommandParser
         $this->includedNamespaces = $includedNamespaces;
 
         if (count($this->excludedNamespaces) > 0 && count($this->includedNamespaces) > 0) {
-            throw new \InvalidArgumentException('Cannot combine excludedNamespaces with includedNamespaces');
+            throw new InvalidArgumentException('Cannot combine excludedNamespaces with includedNamespaces');
         }
     }
 
@@ -49,6 +52,7 @@ class CommandParser
      * Execute the console command "list" with XML output to have all available command.
      *
      * @return array
+     * @throws Exception
      */
     public function getCommands()
     {
@@ -83,22 +87,26 @@ class CommandParser
             return [];
         }
 
-        $node = new \SimpleXMLElement($xml);
+        $node = new SimpleXMLElement($xml);
         $commandsList = [];
 
-        foreach ($node->namespaces->namespace as $namespace) {
-            $namespaceId = (string) $namespace->attributes()->id;
+        if (isset($node->namespaces)) {
+            foreach ($node->namespaces->namespace as $namespace) {
+                $namespaceId = (string) $namespace->attributes()->id;
 
-            if (
-                (count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces))
-                ||
-                (count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces))
-            ) {
-                continue;
-            }
+                if (
+                    (count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces))
+                    ||
+                    (count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces))
+                ) {
+                    continue;
+                }
 
-            foreach ($namespace->command as $command) {
-                $commandsList[$namespaceId][(string) $command] = (string) $command;
+                if (isset($namespace->command)) {
+                    foreach ($namespace->command as $command) {
+                        $commandsList[$namespaceId][(string) $command] = (string) $command;
+                    }
+                }
             }
         }
 

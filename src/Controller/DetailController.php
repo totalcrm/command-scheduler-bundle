@@ -29,7 +29,7 @@ class DetailController extends BaseController
         }
 
         return $this->render(
-            '@CommandScheduler/Detail/index.html.twig',
+            '@CommandSchedulerBundle/Detail/index.html.twig',
             [
                 'scheduledCommandForm' => $scheduledCommandForm->createView(),
             ]
@@ -86,9 +86,8 @@ class DetailController extends BaseController
 
         // Init and populate form object
         $commandDetail = $request->request->get('command_scheduler_detail');
-        if ('' != $commandDetail['id']) {
-            $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)
-                ->find($commandDetail['id']);
+        if ($commandDetail['id']) {
+            $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)->find($commandDetail['id']);
         } else {
             $scheduledCommand = new ScheduledCommand();
         }

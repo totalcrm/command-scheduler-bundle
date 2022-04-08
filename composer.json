@@ -18,12 +18,9 @@
         "doctrine/doctrine-bundle": "^1.6.10|^2.0",
         "dragonmantank/cron-expression": "^3.0",
         "symfony/framework-bundle": "^3.4|^4.3|^5.0",
-        "symfony/twig-bundle": "^3.4|^4.3|^5.0",
-        "symfony/translation": "^3.4|^4.3|^5.0",
         "symfony/form": "^3.4|^4.3|^5.0",
-        "symfony/asset": "^3.4|^4.3|^5.0",
-        "symfony/templating": "^3.4|^4.3|^5.0",
-        "symfony/validator": "^3.4|^4.3|^5.0"
+        "symfony/validator": "^3.4|^4.3|^5.0",
+        "ext-simplexml": "*"
     },
     "require-dev": {
         "ext-pcntl": "*",

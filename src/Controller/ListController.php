@@ -2,10 +2,15 @@
 
 namespace TotalCRM\CommandScheduler\Controller;
 
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 /**
  * Class ListController.
@@ -30,93 +35,95 @@ class ListController extends BaseController
      */
     public function indexAction(): JsonResponse
     {
-        $scheduledCommands = $this->getDoctrineManager()->getRepository('CommandSchedulerBundle:ScheduledCommand')->findAll();
+        /** @var ScheduledCommandRepository $scheduledCommandsRepository */
+        $scheduledCommandsRepository = $this->getDoctrineManager()->getRepository(ScheduledCommand::class);
+        /** @var ScheduledCommand[] $scheduledCommands */
+        $scheduledCommands = $scheduledCommandsRepository->findAll();
+
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+        $defaultTimezone = (new \DateTime())->getTimezone();
+
+        $scheduledCommandsNormalize = $serializer->normalize($scheduledCommands, null, [
+            DateTimeNormalizer::TIMEZONE_KEY => $defaultTimezone
+        ]);
 
         $response = new JsonResponse();
-        $response->setContent(json_encode($scheduledCommands));
+        $response->setContent(json_encode($scheduledCommandsNormalize));
 
         return $response;
     }
 
     /**
      * @param $id
-     * @return Response
+     * @return JsonResponse
      */
     public function removeAction($id)
     {
         $entityManager = $this->getDoctrineManager();
         $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)->find($id);
-
         $entityManager->remove($scheduledCommand);
         $entityManager->flush();
 
-        // Add a flash message and do a redirect to the list
-        $this->get('session')->getFlashBag()->add('success', $this->translator->trans('flash.deleted', [], 'CommandScheduler'));
+        $response = new JsonResponse();
+        $response->setContent(null);
 
-        return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
+        return $response;
     }
 
     /**
      * @param $id
-     *
-     * @return Response
+     * @return JsonResponse
      */
     public function toggleAction($id)
     {
-        $entityManager = $this->getDoctrineManager();
-        $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)->find($id);
+        $em = $this->getDoctrineManager();
+        $scheduledCommand = $em->getRepository(ScheduledCommand::class)->find($id);
         $scheduledCommand->setDisabled(!$scheduledCommand->isDisabled());
-        $entityManager->flush();
+        $em->flush();
 
-        return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
+        $response = new JsonResponse();
+        $response->setContent(null);
+
+        return $response;
     }
 
     /**
      * @param $id
      * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse
      */
     public function executeAction($id, Request $request)
     {
-        $entityManager = $this->getDoctrineManager();
-        $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)->find($id);
+        $em = $this->getDoctrineManager();
+        $scheduledCommand = $em->getRepository(ScheduledCommand::class)->find($id);
         $scheduledCommand->setExecuteImmediately(true);
-        $entityManager->flush();
+        $em->flush();
 
-        // Add a flash message and do a redirect to the list
-        $this->get('session')->getFlashBag()
-            ->add('success', $this->translator->trans('flash.execute', [], 'CommandScheduler'));
+        $response = new JsonResponse();
+        $response->setContent(null);
 
-        if ($request->query->has('referer')) {
-            return $this->redirect($request->getSchemeAndHttpHost().urldecode($request->query->get('referer')));
-        }
-
-        return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
+        return $response;
     }
 
     /**
      * @param $id
      * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse
      */
     public function unlockAction($id, Request $request)
     {
-        $entityManager = $this->getDoctrineManager();
-        $scheduledCommand = $entityManager->getRepository(ScheduledCommand::class)->find($id);
+        $em = $this->getDoctrineManager();
+        $scheduledCommand = $em->getRepository(ScheduledCommand::class)->find($id);
         $scheduledCommand->setLocked(false);
-        $entityManager->flush();
+        $em->persist($scheduledCommand);
+        $em->flush();
 
-        // Add a flash message and do a redirect to the list
-        $this->get('session')->getFlashBag()
-            ->add('success', $this->translator->trans('flash.unlocked', [], 'CommandScheduler'));
+        $response = new JsonResponse();
+        $response->setContent(null);
 
-        if ($request->query->has('referer')) {
-            return $this->redirect($request->getSchemeAndHttpHost().urldecode($request->query->get('referer')));
-        }
-
-        return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
+        return $response;
     }
 
     /**
@@ -124,22 +131,21 @@ class ListController extends BaseController
      */
     public function monitorAction()
     {
-        $failedCommands = $this->getDoctrineManager()
-            ->getRepository(ScheduledCommand::class)
-            ->findFailedAndTimeoutCommands($this->lockTimeout);
+        $em = $this->getDoctrineManager();
+        $failedCommands = $em->getRepository(ScheduledCommand::class)->findFailedAndTimeoutCommands($this->lockTimeout);
 
-        $jsonArray = [];
+        $results = [];
         foreach ($failedCommands as $command) {
-            $jsonArray[$command->getName()] = [
-                'LAST_RETURN_CODE' => $command->getLastReturnCode(),
-                'B_LOCKED' => $command->getLocked() ? 'true' : 'false',
-                'DH_LAST_EXECUTION' => $command->getLastExecution(),
+            $results[$command->getId()] = [
+                'lastReturnCode' => $command->getLastReturnCode(),
+                'locked' => $command->getLocked() ? 'true' : 'false',
+                'lastExecution' => $command->getLastExecution(),
             ];
         }
 
         $response = new JsonResponse();
-        $response->setContent(json_encode($jsonArray));
-        $response->setStatusCode(count($jsonArray) > 0 ? Response::HTTP_EXPECTATION_FAILED : Response::HTTP_OK);
+        $response->setContent(json_encode($results));
+        $response->setStatusCode(count($results) > 0 ? Response::HTTP_EXPECTATION_FAILED : Response::HTTP_OK);
 
         return $response;
     }

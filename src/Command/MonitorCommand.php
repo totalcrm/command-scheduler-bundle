@@ -2,11 +2,15 @@
 
 namespace TotalCRM\CommandScheduler\Command;
 
+use DateTimeInterface;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
+use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 
 /**
  * Class MonitorCommand
@@ -15,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MonitorCommand extends Command
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
@@ -80,7 +84,8 @@ class MonitorCommand extends Command
             ->setName('scheduler:monitor')
             ->setDescription('Monitor scheduled commands')
             ->addOption('dump', null, InputOption::VALUE_NONE, 'Display result instead of send mail')
-            ->setHelp('This class is for monitoring all active commands.');
+            ->setHelp('This class is for monitoring all active commands.')
+        ;
     }
 
     /**
@@ -100,8 +105,10 @@ class MonitorCommand extends Command
         }
 
         // Fist, get all failed or potential timeout
-        $failedCommands = $this->em->getRepository('CommandSchedulerBundle:ScheduledCommand')
-            ->findFailedAndTimeoutCommands($this->lockTimeout);
+        /** @var ScheduledCommandRepository $scheduledCommandRepository */
+        $scheduledCommandRepository = $this->em->getRepository(ScheduledCommand::class);
+        /** @var ScheduledCommand[] $failedCommands */
+        $failedCommands = $scheduledCommandRepository->findFailedAndTimeoutCommands($this->lockTimeout);
 
         // Commands in error
         if (count($failedCommands) > 0) {
@@ -113,7 +120,7 @@ class MonitorCommand extends Command
                     $command->getName(),
                     $command->getLastReturnCode(),
                     $command->getLocked(),
-                    $command->getLastExecution()->format(\DateTimeInterface::ATOM)
+                    $command->getLastExecution()->format(DateTimeInterface::ATOM)
                 );
             }
 

@@ -4,17 +4,18 @@ namespace TotalCRM\CommandScheduler\Entity\Repository;
 
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\TransactionRequiredException;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 
 /**
- * Class ScheduledCommandRepository.
+ * Class ScheduledCommandRepository
+ * @package TotalCRM\CommandScheduler\Entity\Repository
  */
 class ScheduledCommandRepository extends EntityRepository
 {
     /**
-     * Find all enabled command ordered by priority.
-     *
-     * @return ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]
      */
     public function findEnabledCommand()
     {
@@ -22,9 +23,7 @@ class ScheduledCommandRepository extends EntityRepository
     }
 
     /**
-     * findAll override to implement the default orderBy clause.
-     *
-     * @return ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]
      */
     public function findAll()
     {
@@ -32,9 +31,7 @@ class ScheduledCommandRepository extends EntityRepository
     }
 
     /**
-     * Find all locked commands.
-     *
-     * @return ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]
      */
     public function findLockedCommand()
     {
@@ -42,9 +39,7 @@ class ScheduledCommandRepository extends EntityRepository
     }
 
     /**
-     * Find all failed command.
-     *
-     * @return ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]
      */
     public function findFailedCommand()
     {
@@ -58,7 +53,7 @@ class ScheduledCommandRepository extends EntityRepository
     /**
      * @param int|bool $lockTimeout
      *
-     * @return array|\TotalCRM\CommandScheduler\Entity\ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]
      */
     public function findFailedAndTimeoutCommands($lockTimeout = false)
     {
@@ -82,10 +77,9 @@ class ScheduledCommandRepository extends EntityRepository
     /**
      * @param ScheduledCommand $command
      *
-     * @return mixed
+     * @return ScheduledCommand|null
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @throws NonUniqueResultException|TransactionRequiredException
      */
     public function getNotLockedCommand(ScheduledCommand $command)
     {

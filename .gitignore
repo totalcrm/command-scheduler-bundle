@@ -2,3 +2,6 @@ vendor/
 composer.lock
 build/
 .php_cs.cache
+.git
+.idea
+.github

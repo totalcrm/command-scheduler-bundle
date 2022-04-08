@@ -2,6 +2,8 @@
 
 namespace TotalCRM\CommandScheduler\Entity;
 
+use DateTime;
+
 /**
  * Entity ScheduledCommand.
  */
@@ -28,6 +30,11 @@ class ScheduledCommand
     private $arguments;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @see http://www.abunchofutils.com/utils/developer/cron-expression-helper/
      *
      * @var string
@@ -35,7 +42,7 @@ class ScheduledCommand
     private $cronExpression;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $lastExecution;
 
@@ -78,7 +85,7 @@ class ScheduledCommand
      */
     public function __construct()
     {
-        $this->setLastExecution(new \DateTime());
+        $this->setLastExecution(new DateTime());
         $this->setLocked(false);
     }
 
@@ -121,7 +128,7 @@ class ScheduledCommand
      *
      * @param string $name
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setName($name)
     {
@@ -145,7 +152,7 @@ class ScheduledCommand
      *
      * @param string $command
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setCommand($command)
     {
@@ -169,11 +176,35 @@ class ScheduledCommand
      *
      * @param string $arguments
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setArguments($arguments)
     {
         $this->arguments = $arguments;
+
+        return $this;
+    }
+
+    /**
+     * Get description.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * Set description.
+     *
+     * @param string $description
+     *
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -193,7 +224,7 @@ class ScheduledCommand
      *
      * @param string $cronExpression
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setCronExpression($cronExpression)
     {
@@ -205,7 +236,7 @@ class ScheduledCommand
     /**
      * Get lastExecution.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getLastExecution()
     {
@@ -215,9 +246,9 @@ class ScheduledCommand
     /**
      * Set lastExecution.
      *
-     * @param \DateTime $lastExecution
+     * @param DateTime $lastExecution
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setLastExecution($lastExecution)
     {
@@ -241,7 +272,7 @@ class ScheduledCommand
      *
      * @param string $logFile
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setLogFile($logFile)
     {
@@ -265,7 +296,7 @@ class ScheduledCommand
      *
      * @param int $lastReturnCode
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setLastReturnCode($lastReturnCode)
     {
@@ -289,7 +320,7 @@ class ScheduledCommand
      *
      * @param int $priority
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setPriority($priority)
     {
@@ -323,7 +354,7 @@ class ScheduledCommand
      *
      * @param $executeImmediately
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setExecuteImmediately($executeImmediately)
     {
@@ -357,7 +388,7 @@ class ScheduledCommand
      *
      * @param bool $disabled
      *
-     * @return ScheduledCommand
+     * @return $this
      */
     public function setDisabled($disabled)
     {

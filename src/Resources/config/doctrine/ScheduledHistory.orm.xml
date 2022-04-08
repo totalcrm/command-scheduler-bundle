@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TotalCRM\CommandScheduler\Entity\ScheduledHistory" table="scheduled_history" repository-class="TotalCRM\CommandScheduler\Entity\Repository\ScheduledHistoryRepository">
+        <id name="id" type="integer" column="id">
+            <generator strategy="IDENTITY" />
+        </id>
+        <field name="commandId" column="command_id" type="integer" nullable="true" unique="false" />
+        <field name="messages" column="messages" type="text" nullable="true" unique="false" />
+        <field name="error" column="error" type="text" nullable="true" unique="false" />
+        <field name="dateExecution" column="date_execution" type="datetime" nullable="false" unique="false" />
+        <field name="returnCode" column="return_code" type="integer" nullable="true" unique="false" />
+    </entity>
+</doctrine-mapping>
