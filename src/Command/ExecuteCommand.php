@@ -219,6 +219,16 @@ class ExecuteCommand extends Command
 
         /** @var ScheduledCommand $scheduledCommand */
         $scheduledCommand = $this->em->find(ScheduledCommand::class, $scheduledCommand);
+        $scheduledHistory = null;
+
+        if ($scheduledCommand->isHistory()) {
+            $scheduledHistory = new ScheduledHistory();
+            $scheduledHistory
+                ->setDateExecution(new DateTime())
+                ->setCommandId($scheduledCommand->getId())
+            ;
+            $this->em->persist($scheduledHistory);
+        }
 
         try {
             /** @var Command $command */
@@ -285,11 +295,9 @@ class ExecuteCommand extends Command
         ;
         $this->em->persist($scheduledCommand);
 
-        if ($scheduledCommand->isHistory()) {
-            $scheduledHistory = new ScheduledHistory();
+        if ($scheduledCommand->isHistory() && $scheduledHistory instanceof ScheduledHistory) {
             $scheduledHistory
                 ->setDateExecution(new DateTime())
-                ->setCommandId($scheduledCommand->getId())
                 ->setReturnCode($result)
                 ->setMessages($messages)
             ;
