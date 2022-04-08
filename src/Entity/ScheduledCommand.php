@@ -35,6 +35,11 @@ class ScheduledCommand
     private $description;
 
     /**
+     * @var string
+     */
+    private $error;
+
+    /**
      * @see http://www.abunchofutils.com/utils/developer/cron-expression-helper/
      *
      * @var string
@@ -427,6 +432,25 @@ class ScheduledCommand
     public function setLocked($locked)
     {
         $this->locked = $locked;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     * @return $this
+     */
+    public function setError(string $error): self
+    {
+        $this->error = $error;
 
         return $this;
     }
