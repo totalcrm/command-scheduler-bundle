@@ -14,7 +14,7 @@
         <field name="cronExpression" column="cron_expression" type="string" length="100" nullable="true" unique="false" />
         <field name="lastExecution" column="last_execution" type="datetime" nullable="true" unique="false" />
         <field name="lastReturnCode" column="last_return_code" type="integer" nullable="true" unique="false" />
-        <field name="lastMessages" column="last_return_code" type="text" nullable="true" unique="false" />
+        <field name="lastMessages" column="last_messages" type="text" nullable="true" unique="false" />
         <field name="logFile" column="log_file" type="string" length="100" nullable="true" unique="false" />
         <field name="isHistory" column="history" type="boolean" nullable="true" unique="false" />
         <field name="priority" column="priority" type="integer" nullable="true" unique="false" />
