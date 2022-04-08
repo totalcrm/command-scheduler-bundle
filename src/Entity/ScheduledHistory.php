@@ -25,6 +25,11 @@ class ScheduledHistory
     private $messages;
 
     /**
+     * @var string
+     */
+    private $error;
+
+    /**
      * @var DateTime
      */
     private $dateExecution;
@@ -158,6 +163,25 @@ class ScheduledHistory
     public function setReturnCode($returnCode)
     {
         $this->returnCode = $returnCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     * @return $this
+     */
+    public function setError(string $error): self
+    {
+        $this->error = $error;
 
         return $this;
     }
