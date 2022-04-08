@@ -3,6 +3,7 @@
 namespace TotalCRM\CommandScheduler\Entity;
 
 use DateTime;
+use Exception;
 
 /**
  * Class ScheduledHistory
@@ -41,7 +42,8 @@ class ScheduledHistory
     private $returnCode;
 
     /**
-     * Init new ScheduledHistory.
+     * ScheduledHistory constructor.
+     * @throws Exception
      */
     public function __construct()
     {
@@ -49,8 +51,6 @@ class ScheduledHistory
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -59,11 +59,8 @@ class ScheduledHistory
     }
 
     /**
-     * Set id.
-     *
      * @param $id
-     *
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setId($id)
     {
@@ -73,8 +70,6 @@ class ScheduledHistory
     }
 
     /**
-     * Get commandId.
-     *
      * @return int
      */
     public function getCommandId()
@@ -83,11 +78,8 @@ class ScheduledHistory
     }
 
     /**
-     * Set commandId.
-     *
      * @param int $commandId
-     *
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setCommandId($commandId)
     {
@@ -97,8 +89,6 @@ class ScheduledHistory
     }
 
     /**
-     * Get messages.
-     *
      * @return string
      */
     public function getMessages()
@@ -107,11 +97,8 @@ class ScheduledHistory
     }
 
     /**
-     * Set messages.
-     *
      * @param string $messages
-     *
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setMessages($messages)
     {
@@ -121,8 +108,6 @@ class ScheduledHistory
     }
 
     /**
-     * Get dateExecution.
-     *
      * @return DateTime
      */
     public function getDateExecution()
@@ -131,11 +116,8 @@ class ScheduledHistory
     }
 
     /**
-     * Set dateExecution.
-     *
      * @param DateTime $dateExecution
-     *
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setDateExecution($dateExecution)
     {
@@ -145,8 +127,6 @@ class ScheduledHistory
     }
 
     /**
-     * Get returnCode.
-     *
      * @return int
      */
     public function getReturnCode()
@@ -155,11 +135,8 @@ class ScheduledHistory
     }
 
     /**
-     * Set lastReturnCode.
-     *
      * @param int $returnCode
-     *
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setReturnCode($returnCode)
     {
@@ -178,7 +155,7 @@ class ScheduledHistory
 
     /**
      * @param string $error
-     * @return $this
+     * @return ScheduledHistory
      */
     public function setError(string $error): self
     {
