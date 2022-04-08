@@ -4,7 +4,6 @@ services:
         autowire: true
         calls:
             - [setManagerName, ["%totalcrm_command_scheduler.doctrine_manager%"]]
-            - [setTranslator, ["@translator"]]
         tags: [container.service_subscriber]
 
     TotalCRM\CommandScheduler\Controller\ListController:
@@ -12,7 +11,6 @@ services:
         autowire: true
         calls:
             - [setManagerName, ["%totalcrm_command_scheduler.doctrine_manager%"]]
-            - [setTranslator, ["@translator"]]
             - [setLockTimeout, ["%totalcrm_command_scheduler.lock_timeout%"]]
         tags: [container.service_subscriber]
 

@@ -102,10 +102,6 @@ class DetailController extends BaseController
             }
             $entityManager->flush();
 
-            // Add a flash message and do a redirect to the list
-            $this->get('session')->getFlashBag()
-                ->add('success', $this->translator->trans('flash.success', [], 'CommandScheduler'));
-
             return $this->redirect($this->generateUrl('totalcrm_command_scheduler_list'));
         }
 
