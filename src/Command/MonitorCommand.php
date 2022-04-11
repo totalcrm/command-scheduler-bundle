@@ -15,6 +15,7 @@ use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 /**
  * Class MonitorCommand
  * @package TotalCRM\CommandScheduler\Command
+ * Start bin/console scheduler:monitor
  */
 class MonitorCommand extends Command
 {

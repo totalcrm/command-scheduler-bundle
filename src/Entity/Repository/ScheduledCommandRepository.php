@@ -75,18 +75,18 @@ class ScheduledCommandRepository extends EntityRepository
     }
 
     /**
-     * @param ScheduledCommand $command
+     * @param int $commandId
      *
      * @return ScheduledCommand|null
      *
      * @throws NonUniqueResultException|TransactionRequiredException
      */
-    public function getNotLockedCommand(ScheduledCommand $command)
+    public function getNotLockedCommand(int $commandId)
     {
         $query = $this->createQueryBuilder('command')
             ->where('command.locked = false')
             ->andWhere('command.id = :id')
-            ->setParameter('id', $command->getId())
+            ->setParameter('id', $commandId)
             ->getQuery();
 
         $query->setLockMode(LockMode::PESSIMISTIC_WRITE);

@@ -141,7 +141,9 @@ class ExecuteCommand extends Command
         $noneExecution = true;
         /** @var ScheduledCommand $command */
         foreach ($commands as $command) {
-            $this->em->refresh($commandRepository->find($command->getId()));
+
+            $command = $commandRepository->find($command->getId());
+
             if ($command->isDisabled() || $command->isLocked()) {
                 continue;
             }
@@ -199,20 +201,21 @@ class ExecuteCommand extends Command
         
         try {
             /** @var ScheduledCommand $notLockedCommand */
-            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommand);
+            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommand->getId());
 
-            if (null === $notLockedCommand) {
+            if ($notLockedCommand instanceof ScheduledCommand) {
                 throw new \Exception();
             }
 
             /** @var ScheduledCommand $scheduledCommand */
-            $scheduledCommand = $notLockedCommand;
+            $scheduledCommand = $commandRepository->find($scheduledCommand->getId());
             $scheduledCommand->setLastExecution(new DateTime());
             $scheduledCommand->setLocked(true);
 
+            $this->em->getConnection()->commit();
+
             $this->em->persist($scheduledCommand);
             $this->em->flush();
-            $this->em->getConnection()->commit();
 
         } catch (\Exception $e) {
 
