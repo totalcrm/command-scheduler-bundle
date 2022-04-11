@@ -2,6 +2,7 @@
 
 namespace TotalCRM\CommandScheduler\Controller;
 
+use Exception;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,6 +42,7 @@ class DetailController extends BaseController
      * Initialize a new ScheduledCommand object and forward to the index action (view).
      *
      * @return Response
+     * @throws Exception
      */
     public function initNewScheduledCommandAction()
     {
@@ -80,6 +82,7 @@ class DetailController extends BaseController
      * @param Request $request
      *
      * @return Response
+     * @throws Exception
      */
     public function saveAction(Request $request)
     {

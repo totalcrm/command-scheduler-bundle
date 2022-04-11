@@ -7,6 +7,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
@@ -15,6 +16,7 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -31,8 +33,10 @@ use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
  */
 class ExecuteCommand extends Command
 {
+    use LockableTrait;
+
     /**
-     * @var EntityManager
+     * @var EntityManager|EntityManagerInterface
      */
     private $em;
 
@@ -113,19 +117,19 @@ class ExecuteCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->lock('scheduler:execute');
+
         $output->writeln('<info>Start : '.($this->dumpMode ? 'Dump' : 'Execute').' all scheduled command</info>');
 
         // Before continue, we check that the output file is valid and writable (except for gaufrette)
-        if (false !== $this->logPath && 0 !== strpos($this->logPath, 'gaufrette:') && false === is_writable(
-                $this->logPath
-            )
-        ) {
+        if (false !== $this->logPath && 0 !== strpos($this->logPath, 'gaufrette:') && false === is_writable($this->logPath)) {
             $output->writeln(
                 '<error>'.$this->logPath.
                 ' not found or not writable. You should override `log_path` in your config.yml'.'</error>'
             );
+            $this->release();
 
-            return 1;
+            return Command::FAILURE;
         }
 
         /** @var ScheduledCommandRepository $commandRepository */
@@ -142,7 +146,7 @@ class ExecuteCommand extends Command
             }
 
             /** @var CronExpression $cron */
-            $cron = CronExpression::factory($command->getCronExpression());
+            $cron = new CronExpression($command->getCronExpression());
             $nextRunDate = $cron->getNextRunDate($command->getLastExecution());
             $now = new DateTime();
 
@@ -155,7 +159,7 @@ class ExecuteCommand extends Command
                 if (!$input->getOption('dump')) {
                     $this->executeCommand($command, $output, $input);
                 }
-            } elseif ($nextRunDate < $now) {
+            } else if ($nextRunDate < $now) {
                 $noneExecution = false;
                 $output->writeln(
                     'Command <comment>'.$command->getCommand().
@@ -173,28 +177,34 @@ class ExecuteCommand extends Command
             $output->writeln('Nothing to do.');
         }
 
-        return 0;
+        $this->release();
+
+        return Command::SUCCESS;
     }
 
     /**
      * @param ScheduledCommand $scheduledCommand
      * @param OutputInterface $output
      * @param InputInterface $input
-     * @throws ORMException|OptimisticLockException|TransactionRequiredException|Exception|MappingException
+     * @throws Exception
+     * @throws ORMException
      */
     private function executeCommand(ScheduledCommand $scheduledCommand, OutputInterface $output, InputInterface $input)
     {
-        //reload command from database before every execution to avoid parallel execution
+        /** @var ScheduledCommandRepository $commandRepository */
+        $commandRepository = $this->em->getRepository(ScheduledCommand::class);
+
         $this->em->getConnection()->beginTransaction();
         
         try {
             /** @var ScheduledCommand $notLockedCommand */
-            $notLockedCommand = $this->em->getRepository(ScheduledCommand::class)->getNotLockedCommand($scheduledCommand);
+            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommand);
 
             if (null === $notLockedCommand) {
                 throw new \Exception();
             }
 
+            /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $notLockedCommand;
             $scheduledCommand->setLastExecution(new DateTime());
             $scheduledCommand->setLocked(true);
@@ -241,13 +251,12 @@ class ExecuteCommand extends Command
         }
 
         $input = new StringInput(
-            $scheduledCommand->getCommand().' '.$scheduledCommand->getArguments().' --env='.$input->getOption('env')
+            $scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . ' --env=' . $input->getOption('env')
         );
 
         $command->mergeApplicationDefinition();
         $input->bind($command->getDefinition());
 
-        // Disable interactive mode if the current command has no-interaction flag
         if (true === $input->hasParameterOption(['--no-interaction', '-n'])) {
             $input->setInteractive(false);
         }
@@ -268,8 +277,7 @@ class ExecuteCommand extends Command
             /** @var NullOutput $logStreamOutput */
             $logOutput = new NullOutput();
         }
-        
-        // Execute command and get return code
+
         try {
             $output->writeln('<info>Execute</info> : <comment>'.$scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
             $result = $command->run($input, $logBufferedOutput);
@@ -306,11 +314,10 @@ class ExecuteCommand extends Command
 
         $this->em->flush();
 
-        /*
-         * This clear() is necessary to avoid conflict between commands and to be sure that none entity are managed
-         * before entering in a new command
-         */
-        $this->em->clear();
+        try {
+            $this->em->clear();
+        } catch (MappingException $e) {
+        }
 
         unset($command);
         gc_collect_cycles();
