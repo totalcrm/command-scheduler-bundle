@@ -52,7 +52,7 @@ class ScheduledHistory
      */
     public function __construct()
     {
-        $this->setDateExecution(new DateTime());
+        $this->setDateStart(new DateTime());
     }
 
     /**
