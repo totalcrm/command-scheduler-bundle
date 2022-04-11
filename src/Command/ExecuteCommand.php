@@ -117,7 +117,7 @@ class ExecuteCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->lock('scheduler:execute');
+        $this->lock('totalcrm:scheduler:execute');
 
         $output->writeln('<info>Start : '.($this->dumpMode ? 'Dump' : 'Execute').' all scheduled command</info>');
 
