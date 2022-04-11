@@ -34,6 +34,11 @@ class ScheduledHistory
     /**
      * @var DateTime|null
      */
+    private $dateStart;
+
+    /**
+     * @var DateTime|null
+     */
     private $dateExecution;
 
     /**
@@ -103,6 +108,25 @@ class ScheduledHistory
     public function setMessages(?string $messages)
     {
         $this->messages = $messages;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function getDateStart(): ?DateTime
+    {
+        return $this->dateStart;
+    }
+
+    /**
+     * @param DateTime|null $dateStart
+     * @return ScheduledHistory
+     */
+    public function setDateStart(?DateTime $dateStart): self
+    {
+        $this->dateStart = $dateStart;
 
         return $this;
     }

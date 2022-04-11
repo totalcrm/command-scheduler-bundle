@@ -244,8 +244,7 @@ class ExecuteCommand extends Command
         if ($scheduledCommand->isHistory()) {
             $scheduledHistory = new ScheduledHistory();
             $scheduledHistory
-                //->setDateStart(new DateTime())
-                //->setDateExecution(new DateTime())
+                ->setDateStart(new DateTime())
                 ->setCommandId($scheduledCommandId)
             ;
             $this->em->persist($scheduledHistory);

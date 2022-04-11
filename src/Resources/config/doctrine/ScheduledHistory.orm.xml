@@ -10,7 +10,8 @@
         <field name="commandId" column="command_id" type="integer" nullable="true" unique="false" />
         <field name="messages" column="messages" type="text" nullable="true" unique="false" />
         <field name="error" column="error" type="text" nullable="true" unique="false" />
-        <field name="dateExecution" column="date_execution" type="datetime" nullable="false" unique="false" />
+        <field name="dateStart" column="date_start" type="datetime" nullable="true" unique="false" />
+        <field name="dateExecution" column="date_execution" type="datetime" nullable="true" unique="false" />
         <field name="returnCode" column="return_code" type="integer" nullable="true" unique="false" />
     </entity>
 </doctrine-mapping>
