@@ -203,7 +203,7 @@ class ExecuteCommand extends Command
             /** @var ScheduledCommand $notLockedCommand */
             $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommand->getId());
 
-            if ($notLockedCommand instanceof ScheduledCommand) {
+            if (!$notLockedCommand instanceof ScheduledCommand) {
                 throw new \Exception();
             }
 
