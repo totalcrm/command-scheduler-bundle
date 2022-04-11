@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class StartSchedulerCommand
  * @package TotalCRM\CommandScheduler\Command
+ * Start bin/console scheduler:start
  */
 class StartSchedulerCommand extends Command
 {

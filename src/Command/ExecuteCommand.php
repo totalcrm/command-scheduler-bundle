@@ -30,6 +30,7 @@ use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
 /**
  * Class ExecuteCommand
  * @package TotalCRM\CommandScheduler\Command
+ * Start bin/console scheduler:execute
  */
 class ExecuteCommand extends Command
 {
@@ -228,7 +229,7 @@ class ExecuteCommand extends Command
         }
 
         /** @var ScheduledCommand $scheduledCommand */
-        $scheduledCommand = $this->em->find(ScheduledCommand::class, $scheduledCommand);
+        $scheduledCommand = $commandRepository->find($scheduledCommand->getId());
         $scheduledHistory = null;
 
         if ($scheduledCommand->isHistory()) {
