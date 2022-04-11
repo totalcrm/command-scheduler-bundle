@@ -24,6 +24,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
+use TotalCRM\CommandScheduler\Entity\Repository\ScheduledHistoryRepository;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
 
@@ -194,28 +195,33 @@ class ExecuteCommand extends Command
      */
     private function executeCommand(ScheduledCommand $scheduledCommand, OutputInterface $output, InputInterface $input)
     {
+        $scheduledCommandId = $scheduledCommand->getId();
+        $scheduledHistoryId = null;
+
         /** @var ScheduledCommandRepository $commandRepository */
         $commandRepository = $this->em->getRepository(ScheduledCommand::class);
+        /** @var ScheduledHistoryRepository $scheduledHistoryRepository */
+        $scheduledHistoryRepository = $this->em->getRepository(ScheduledHistory::class);
 
         $this->em->getConnection()->beginTransaction();
         
         try {
             /** @var ScheduledCommand $notLockedCommand */
-            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommand->getId());
+            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommandId);
 
             if (!$notLockedCommand instanceof ScheduledCommand) {
                 throw new \Exception();
             }
 
             /** @var ScheduledCommand $scheduledCommand */
-            $scheduledCommand = $commandRepository->find($scheduledCommand->getId());
+            $scheduledCommand = $commandRepository->find($scheduledCommandId);
             $scheduledCommand->setLastExecution(new DateTime());
             $scheduledCommand->setLocked(true);
 
-            $this->em->getConnection()->commit();
 
             $this->em->persist($scheduledCommand);
             $this->em->flush();
+            $this->em->getConnection()->commit();
 
         } catch (\Exception $e) {
 
@@ -232,23 +238,31 @@ class ExecuteCommand extends Command
         }
 
         /** @var ScheduledCommand $scheduledCommand */
-        $scheduledCommand = $commandRepository->find($scheduledCommand->getId());
+        $scheduledCommand = $commandRepository->find($scheduledCommandId);
         $scheduledHistory = null;
 
         if ($scheduledCommand->isHistory()) {
             $scheduledHistory = new ScheduledHistory();
             $scheduledHistory
-                ->setDateExecution(new DateTime())
-                ->setCommandId($scheduledCommand->getId())
+                //->setDateStart(new DateTime())
+                //->setDateExecution(new DateTime())
+                ->setCommandId($scheduledCommandId)
             ;
             $this->em->persist($scheduledHistory);
+            $this->em->flush();
+
+            $scheduledHistoryId = $scheduledHistory->getId();
         }
 
         try {
             /** @var Command $command */
             $command = $this->getApplication()->find($scheduledCommand->getCommand());
+
         } catch (InvalidArgumentException $e) {
             $scheduledCommand->setLastReturnCode(-1);
+            $this->em->persist($scheduledCommand);
+            $this->em->flush();
+
             $output->writeln('<error>Cannot find '.$scheduledCommand->getCommand().'</error>');
 
             return;
@@ -285,9 +299,12 @@ class ExecuteCommand extends Command
         try {
             $output->writeln('<info>Execute</info> : <comment>'.$scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
             $result = $command->run($input, $logBufferedOutput);
+
         } catch (\Exception $e) {
+
             $logBufferedOutput->writeln($e->getMessage());
             $logBufferedOutput->writeln($e->getTraceAsString());
+
             $result = -1;
         }
 
@@ -299,6 +316,8 @@ class ExecuteCommand extends Command
         $messages = $logBufferedOutput->fetch();
         $logOutput->write($messages);
 
+        /** @var ScheduledCommand $scheduledCommand */
+        $scheduledCommand = $commandRepository->find($scheduledCommandId);
         $scheduledCommand
             ->setLastMessages($messages)
             ->setLastReturnCode((int)$result)
@@ -307,7 +326,9 @@ class ExecuteCommand extends Command
         ;
         $this->em->persist($scheduledCommand);
 
-        if ($scheduledCommand->isHistory() && $scheduledHistory instanceof ScheduledHistory) {
+        if ($scheduledCommand->isHistory() && $scheduledHistoryId) {
+            /** @var ScheduledHistory $scheduledHistory */
+            $scheduledHistory = $scheduledHistoryRepository->find($scheduledHistoryId);
             $scheduledHistory
                 ->setDateExecution(new DateTime())
                 ->setReturnCode($result)
