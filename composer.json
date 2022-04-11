@@ -23,7 +23,8 @@
         "symfony/serializer": "^5.0",
         "symfony/lock": "^5.0",
         "ext-simplexml": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-pcntl": "*"
     },
     "require-dev": {
         "ext-pcntl": "*",
