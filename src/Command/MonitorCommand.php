@@ -19,39 +19,16 @@ use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
  */
 class MonitorCommand extends Command
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var bool
-     */
-    private $dumpMode;
-
-    /**
-     * @var int|bool Number of seconds after a command is considered as timeout
-     */
-    private $lockTimeout;
-
-    /**
-     * @var string|array receiver for statusmail if an error occured
-     */
+    private EntityManager $em;
+    private bool $dumpMode;
+    private ?int $lockTimeout;
+    /** @var string|array */
     private $receiver;
-
-    /**
-     * @var string mailSubject subject to be used when sending a mail
-     */
-    private $mailSubject;
-
-    /**
-     * @var bool if true, current command will send mail even if all is ok.
-     */
-    private $sendMailIfNoError;
+    private string $mailSubject;
+    private bool $sendMailIfNoError;
 
     /**
      * MonitorCommand constructor.
-     *
      * @param ManagerRegistry $managerRegistry
      * @param $managerName
      * @param $lockTimeout
@@ -92,26 +69,22 @@ class MonitorCommand extends Command
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     *
-     * @return int|void|null
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // If not in dump mode and none receiver is set, exit.
         $this->dumpMode = $input->getOption('dump');
+        
         if (!$this->dumpMode && 0 === count($this->receiver)) {
             $output->writeln('Please add receiver in configuration');
-
-            return 1;
+            return Command::FAILURE;
         }
 
-        // Fist, get all failed or potential timeout
         /** @var ScheduledCommandRepository $scheduledCommandRepository */
         $scheduledCommandRepository = $this->em->getRepository(ScheduledCommand::class);
         /** @var ScheduledCommand[] $failedCommands */
         $failedCommands = $scheduledCommandRepository->findFailedAndTimeoutCommands($this->lockTimeout);
 
-        // Commands in error
         if (count($failedCommands) > 0) {
             $message = '';
 
@@ -125,7 +98,6 @@ class MonitorCommand extends Command
                 );
             }
 
-            // if --dump option, don't send mail
             if ($this->dumpMode) {
                 $output->writeln($message);
             } else {
@@ -139,30 +111,23 @@ class MonitorCommand extends Command
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
-     * Send message to email receivers.
-     *
      * @param string $message message to be sent
      */
     private function sendMails($message)
     {
-        // prepare email constants
         $hostname = gethostname();
         $subject = $this->getMailSubject();
-        $headers = 'From: cron-monitor@'.$hostname."\r\n".
-            'X-Mailer: PHP/'.phpversion();
-
+        $headers = 'From: cron-monitor@'.$hostname."\r\n". 'X-Mailer: PHP/'.phpversion();
         foreach ($this->receiver as $rcv) {
             mail(trim($rcv), $subject, $message, $headers);
         }
     }
 
     /**
-     * get the subject for monitor mails.
-     *
      * @return string subject
      */
     private function getMailSubject()

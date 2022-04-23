@@ -16,24 +16,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class CommandParser
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
-
-    /**
-     * @var array
-     */
-    private $excludedNamespaces;
-
-    /**
-     * @var array
-     */
-    private $includedNamespaces;
+    private KernelInterface $kernel;
+    private array $excludedNamespaces;
+    private array $includedNamespaces;
 
     /**
      * CommandParser constructor.
-     *
      * @param KernelInterface $kernel
      * @param array           $excludedNamespaces
      * @param array           $includedNamespaces
@@ -50,8 +38,6 @@ class CommandParser
     }
 
     /**
-     * Execute the console command "list" with XML output to have all available command.
-     *
      * @return array
      * @throws Exception
      */
@@ -76,10 +62,7 @@ class CommandParser
     }
 
     /**
-     * Extract an array of available Symfony command from the XML output.
-     *
      * @param $xml
-     *
      * @return array
      */
     private function extractCommandsFromXML($xml)
@@ -95,10 +78,8 @@ class CommandParser
             foreach ($node->namespaces->namespace as $namespace) {
                 $namespaceId = (string) $namespace->attributes()->id;
 
-                if (
-                    (count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces))
-                    ||
-                    (count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces))
+                if ((count($this->excludedNamespaces) > 0 && in_array($namespaceId, $this->excludedNamespaces)) 
+                    ||(count($this->includedNamespaces) > 0 && !in_array($namespaceId, $this->includedNamespaces))
                 ) {
                     continue;
                 }

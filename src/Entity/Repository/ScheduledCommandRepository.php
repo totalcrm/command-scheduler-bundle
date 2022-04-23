@@ -15,47 +15,50 @@ use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 class ScheduledCommandRepository extends EntityRepository
 {
     /**
-     * @return object[]|ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]|null
      */
-    public function findEnabledCommand()
+    public function findEnabledCommand(): ?array
     {
         return $this->findBy(['disabled' => false, 'locked' => false], ['priority' => 'DESC']);
     }
 
     /**
-     * @return object[]|ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]|null
      */
-    public function findAll()
+    public function findAll(): ?array
     {
         return $this->findBy([], ['priority' => 'DESC']);
     }
 
     /**
-     * @return object[]|ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]|null
      */
-    public function findLockedCommand()
+    public function findLockedCommand(): ?array
     {
         return $this->findBy(['disabled' => false, 'locked' => true], ['priority' => 'DESC']);
     }
 
     /**
-     * @return object[]|ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]|null
      */
-    public function findFailedCommand()
+    public function findFailedCommand(): ?array
     {
-        return $this->createQueryBuilder('command')
+        $query = $this
+            ->createQueryBuilder('command')
             ->where('command.disabled = false')
             ->andWhere('command.lastReturnCode != 0')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+        
+        return $query;
     }
 
     /**
      * @param int|bool $lockTimeout
-     *
-     * @return object[]|ScheduledCommand[]
+     * @return object[]|ScheduledCommand[]|null
      */
-    public function findFailedAndTimeoutCommands($lockTimeout = false)
+    public function findFailedAndTimeoutCommands($lockTimeout = false): ?array
     {
         // Fist, get all failed commands (return != 0)
         $failedCommands = $this->findFailedCommand();
@@ -76,18 +79,18 @@ class ScheduledCommandRepository extends EntityRepository
 
     /**
      * @param int $commandId
-     *
      * @return ScheduledCommand|null
-     *
      * @throws NonUniqueResultException|TransactionRequiredException
      */
-    public function getNotLockedCommand(int $commandId)
+    public function getNotLockedCommand(int $commandId): ?ScheduledCommand
     {
-        $query = $this->createQueryBuilder('command')
+        $query = $this
+            ->createQueryBuilder('command')
             ->where('command.locked = false')
             ->andWhere('command.id = :id')
             ->setParameter('id', $commandId)
-            ->getQuery();
+            ->getQuery()
+        ;
 
         $query->setLockMode(LockMode::PESSIMISTIC_WRITE);
 

@@ -19,17 +19,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StartSchedulerCommand extends Command
 {
     use LockableTrait;
-
     const PID_FILE = '.cron-pid';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('scheduler:start')
             ->setDescription('Starts command scheduler')
-            ->addOption('blocking', 'b', InputOption::VALUE_NONE, 'Run in blocking mode.');
+            ->addOption('blocking', 'b', InputOption::VALUE_NONE, 'Run in blocking mode.')
+        ;
     }
 
     /**
@@ -38,19 +35,17 @@ class StartSchedulerCommand extends Command
      * @return int
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
-
             return Command::SUCCESS;
         }
 
         if ($input->getOption('blocking')) {
             $output->writeln(sprintf('<info>%s</info>', 'Starting command scheduler in blocking mode.'));
-            $this->scheduler($output->isVerbose() ? $output : new NullOutput(), null);
-
-            return 0;
+            $this->schedulerExecute($output->isVerbose() ? $output : new NullOutput(), null);
+            return Command::SUCCESS;
         }
 
         if (!extension_loaded('pcntl')) {
@@ -68,24 +63,24 @@ class StartSchedulerCommand extends Command
 
             $output->writeln(sprintf('<info>%s</info>', 'Command scheduler started in non-blocking mode...'));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         if (-1 === posix_setsid()) {
             throw new \RuntimeException('Unable to set the child process as session leader.');
         }
 
-        $this->scheduler(new NullOutput(), $pidFile);
+        $this->schedulerExecute(new NullOutput(), $pidFile);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
      * @param OutputInterface $output
-     * @param $pidFile
+     * @param string $pidFile
      * @throws Exception
      */
-    private function scheduler(OutputInterface $output, $pidFile)
+    private function schedulerExecute(OutputInterface $output, ?string $pidFile = null)
     {
         $input = new ArrayInput([]);
 

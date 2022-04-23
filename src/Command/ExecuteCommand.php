@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -35,52 +34,30 @@ use TotalCRM\CommandScheduler\Entity\ScheduledHistory;
  */
 class ExecuteCommand extends Command
 {
-    use LockableTrait;
-
-    /**
-     * @var EntityManager|EntityManagerInterface
-     */
+    /** @var EntityManager|EntityManagerInterface */
     private $em;
-
-    /**
-     * @var string
-     */
-    private $logPath;
-
-    /**
-     * @var bool
-     */
-    private $dumpMode;
-
-    /**
-     * @var int
-     */
-    private $commandsVerbosity;
+    private string $logPath;
+    private bool $dumpMode;
+    private int $commandsVerbosity;
 
     /**
      * ExecuteCommand constructor.
-     *
      * @param ManagerRegistry $managerRegistry
-     * @param $managerName
-     * @param $logPath
+     * @param string|null $managerName
+     * @param string|null $logPath
      */
-    public function __construct(ManagerRegistry $managerRegistry, $managerName, $logPath)
+    public function __construct(ManagerRegistry $managerRegistry, ?string $managerName = null, ?string $logPath = null)
     {
+        parent::__construct();
+        
         $this->em = $managerRegistry->getManager($managerName);
         $this->logPath = $logPath;
-
-        // If logpath is not set to false, append the directory separator to it
         if (false !== $this->logPath) {
             $this->logPath = rtrim($this->logPath, '/\\').DIRECTORY_SEPARATOR;
         }
-
-        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('scheduler:execute')
@@ -92,16 +69,12 @@ class ExecuteCommand extends Command
     }
 
     /**
-     * Initialize parameters and services used in execute function.
-     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->dumpMode = $input->getOption('dump');
-
-        // Store the original verbosity before apply the quiet parameter
         $this->commandsVerbosity = $output->getVerbosity();
 
         if (true === $input->getOption('no-output')) {
@@ -112,15 +85,11 @@ class ExecuteCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return int
-     *
      * @throws Exception|MappingException|OptimisticLockException|TransactionRequiredException|\Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $this->lock('totalcrm:scheduler:execute');
-
         $output->writeln('<info>Start : '.($this->dumpMode ? 'Dump' : 'Execute').' all scheduled command</info>');
 
         // Before continue, we check that the output file is valid and writable (except for gaufrette)
@@ -129,7 +98,6 @@ class ExecuteCommand extends Command
                 '<error>'.$this->logPath.
                 ' not found or not writable. You should override `log_path` in your config.yml'.'</error>'
             );
-            $this->release();
 
             return Command::FAILURE;
         }
@@ -181,8 +149,6 @@ class ExecuteCommand extends Command
             $output->writeln('Nothing to do.');
         }
 
-        $this->release();
-
         return Command::SUCCESS;
     }
 
@@ -218,11 +184,10 @@ class ExecuteCommand extends Command
             $scheduledCommand->setLastExecution(new DateTime());
             $scheduledCommand->setLocked(true);
 
-
             $this->em->persist($scheduledCommand);
             $this->em->flush();
             $this->em->getConnection()->commit();
-
+            
         } catch (\Exception $e) {
 
             $this->em->getConnection()->rollBack();

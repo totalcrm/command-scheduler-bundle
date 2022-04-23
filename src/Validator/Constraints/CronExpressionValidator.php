@@ -13,8 +13,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 class CronExpressionValidator extends ConstraintValidator
 {
     /**
-     * Validate method for CronExpression constraint.
-     *
      * @param mixed      $value
      * @param Constraint $constraint
      */

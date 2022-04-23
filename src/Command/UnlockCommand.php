@@ -22,50 +22,26 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UnlockCommand extends Command
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var int
-     */
-    private $defaultLockTimeout;
-
-    /**
-     * @var int|bool Number of seconds after a command is considered as timeout
-     */
-    private $lockTimeout;
-
-    /**
-     * @var bool true if all locked commands should be unlocked
-     */
-    private $unlockAll;
-
-    /**
-     * @var string name of the command to be unlocked
-     */
-    private $scheduledCommandName = [];
+    private EntityManager $em;
+    private int $defaultLockTimeout;
+    private int $lockTimeout;
+    private bool $unlockAll;
+    private string $scheduledCommandName;
 
     /**
      * UnlockCommand constructor.
-     *
      * @param ManagerRegistry $managerRegistry
      * @param $managerName
      * @param $lockTimeout
      */
     public function __construct(ManagerRegistry $managerRegistry, $managerName, $lockTimeout)
     {
+        parent::__construct();
         $this->em = $managerRegistry->getManager($managerName);
         $this->defaultLockTimeout = $lockTimeout;
-
-        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('scheduler:unlock')
@@ -77,16 +53,15 @@ class UnlockCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Use this lock timeout value instead of the configured one (in seconds, optional)'
-            );
+            )
+        ;
     }
 
     /**
-     * Initialize parameters and services used in execute function.
-     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->unlockAll = $input->getOption('all');
         $this->scheduledCommandName = $input->getArgument('name');
@@ -105,17 +80,16 @@ class UnlockCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return int
      * @throws OptimisticLockException
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (false === $this->unlockAll && null === $this->scheduledCommandName) {
             $output->writeln('Either the name of a scheduled command or the --all option must be set.');
 
-            return 1;
+            return Command::SUCCESS;
         }
 
         /** @var ScheduledCommandRepository $repository */
@@ -137,14 +111,13 @@ class UnlockCommand extends Command
                     )
                 );
 
-                return 1;
+                return Command::SUCCESS;
             }
             $this->unlock($scheduledCommand, $output);
         }
-
         $this->em->flush();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
