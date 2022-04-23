@@ -192,7 +192,7 @@ class ScheduledCommand
      */
     public function getDescription(): ?string
     {
-        return $this->arguments;
+        return $this->description;
     }
 
     /**
