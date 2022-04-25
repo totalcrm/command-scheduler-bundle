@@ -22,8 +22,8 @@ class ScheduledCommandRepository extends EntityRepository
         $query = $this
             ->createQueryBuilder('command')
             ->andWhere('command.disabled = false AND (command.locked = false OR command.autoLocked = true)')
-            ->orWhere('command.executeImmediately = true')
-            ->orderBy('priority', 'DESC')
+            ->orWhere('command.executeImmediately = 1')
+            ->orderBy('command.priority', 'DESC')
             ->getQuery()
             ->getResult()
         ;
@@ -49,7 +49,7 @@ class ScheduledCommandRepository extends EntityRepository
             ->andWhere('command.disabled = false')
             ->andWhere('command.locked = true')
             ->andWhere('command.autoLocked = false')
-            ->orderBy('priority', 'DESC')
+            ->orderBy('command.priority', 'DESC')
             ->getQuery()
             ->getResult()
         ;
