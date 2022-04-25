@@ -19,7 +19,16 @@ class ScheduledCommandRepository extends EntityRepository
      */
     public function findEnabledCommand(): ?array
     {
-        return $this->findBy(['disabled' => false, 'locked' => false], ['priority' => 'DESC']);
+        $query = $this
+            ->createQueryBuilder('command')
+            ->andWhere('command.disabled = false')
+            ->andWhere('command.locked = false OR command.autoLocked = true')
+            ->orderBy('priority', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $query;
     }
 
     /**
@@ -35,7 +44,17 @@ class ScheduledCommandRepository extends EntityRepository
      */
     public function findLockedCommand(): ?array
     {
-        return $this->findBy(['disabled' => false, 'locked' => true], ['priority' => 'DESC']);
+        $query = $this
+            ->createQueryBuilder('command')
+            ->andWhere('command.disabled = false')
+            ->andWhere('command.locked = true')
+            ->andWhere('command.autoLocked = false')
+            ->orderBy('priority', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $query;
     }
 
     /**
@@ -60,10 +79,7 @@ class ScheduledCommandRepository extends EntityRepository
      */
     public function findFailedAndTimeoutCommands($lockTimeout = false): ?array
     {
-        // Fist, get all failed commands (return != 0)
         $failedCommands = $this->findFailedCommand();
-
-        // Then, si a timeout value is set, get locked commands and check timeout
         if (false !== $lockTimeout) {
             $lockedCommands = $this->findLockedCommand();
             foreach ($lockedCommands as $lockedCommand) {
@@ -86,7 +102,7 @@ class ScheduledCommandRepository extends EntityRepository
     {
         $query = $this
             ->createQueryBuilder('command')
-            ->where('command.locked = false')
+            ->andWhere('command.locked = false OR command.autoLocked = true')
             ->andWhere('command.id = :id')
             ->setParameter('id', $commandId)
             ->getQuery()

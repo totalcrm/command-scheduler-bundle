@@ -92,12 +92,8 @@ class ExecuteCommand extends Command
     {
         $output->writeln('<info>Start : '.($this->dumpMode ? 'Dump' : 'Execute').' all scheduled command</info>');
 
-        // Before continue, we check that the output file is valid and writable (except for gaufrette)
         if (false !== $this->logPath && 0 !== strpos($this->logPath, 'gaufrette:') && false === is_writable($this->logPath)) {
-            $output->writeln(
-                '<error>'.$this->logPath.
-                ' not found or not writable. You should override `log_path` in your config.yml'.'</error>'
-            );
+            $output->writeln('<error>' . $this->logPath . ' not found or not writable. You should override `log_path` in your config.yml</error>');
 
             return Command::FAILURE;
         }
@@ -124,19 +120,14 @@ class ExecuteCommand extends Command
 
             if ($command->isExecuteImmediately()) {
                 $noneExecution = false;
-                $output->writeln(
-                    'Immediately execution asked for : <comment>'.$command->getCommand().'</comment>'
-                );
+                $output->writeln('Immediately execution asked for : <comment>'.$command->getCommand().'</comment>');
 
                 if (!$input->getOption('dump')) {
                     $this->executeCommand($command, $output, $input);
                 }
             } else if ($nextRunDate < $now) {
                 $noneExecution = false;
-                $output->writeln(
-                    'Command <comment>'.$command->getCommand().
-                    '</comment> should be executed - last execution : <comment>'.
-                    $command->getLastExecution()->format(DateTimeInterface::ATOM).'.</comment>'
+                $output->writeln('Command <comment>' . $command->getCommand() . '</comment> should be executed - last execution : <comment>' . $command->getLastExecution()->format(DateTimeInterface::ATOM) . '.</comment>'
                 );
 
                 if (!$input->getOption('dump')) {
@@ -269,7 +260,7 @@ class ExecuteCommand extends Command
             $logBufferedOutput->writeln($e->getMessage());
             $logBufferedOutput->writeln($e->getTraceAsString());
 
-            $result = -1;
+            $result = Command::INVALID;
         }
 
         if (false === $this->em->isOpen()) {
