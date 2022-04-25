@@ -77,6 +77,7 @@ class MonitorCommand extends Command
         
         if (!$this->dumpMode && 0 === count($this->receiver)) {
             $output->writeln('Please add receiver in configuration');
+            
             return Command::FAILURE;
         }
 

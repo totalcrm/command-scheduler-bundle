@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StartSchedulerCommand extends Command
 {
     use LockableTrait;
+    
     const PID_FILE = '.cron-pid';
 
     protected function configure()
@@ -39,12 +40,14 @@ class StartSchedulerCommand extends Command
     {
         if (!$this->lock()) {
             $output->writeln('The command is already running in another process.');
+            
             return Command::SUCCESS;
         }
 
         if ($input->getOption('blocking')) {
             $output->writeln(sprintf('<info>%s</info>', 'Starting command scheduler in blocking mode.'));
             $this->schedulerExecute($output->isVerbose() ? $output : new NullOutput(), null);
+            
             return Command::SUCCESS;
         }
 

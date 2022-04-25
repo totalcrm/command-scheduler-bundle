@@ -27,8 +27,9 @@ class StopSchedulerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $pidFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.StartSchedulerCommand::PID_FILE;
+        $pidFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . StartSchedulerCommand::PID_FILE;
         if (!file_exists($pidFile)) {
+            
             return Command::SUCCESS;
         }
         
