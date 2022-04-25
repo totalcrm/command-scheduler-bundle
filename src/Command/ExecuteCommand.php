@@ -172,8 +172,11 @@ class ExecuteCommand extends Command
 
             /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $commandRepository->find($scheduledCommandId);
-            $scheduledCommand->setLastExecution(new DateTime());
-            $scheduledCommand->setLocked(true);
+            $scheduledCommand
+                ->setLastExecution(new DateTime())
+                ->setExecuteImmediately(false)
+                ->setLocked(true)
+            ;
 
             $this->em->persist($scheduledCommand);
             $this->em->flush();
@@ -276,7 +279,6 @@ class ExecuteCommand extends Command
         $scheduledCommand
             ->setLastMessages($messages)
             ->setLastReturnCode((int)$result)
-            ->setExecuteImmediately(false)
             ->setLocked(false)
         ;
         $this->em->persist($scheduledCommand);
