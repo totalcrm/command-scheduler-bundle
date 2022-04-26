@@ -112,7 +112,6 @@ class ScheduledCommand
      */
     public function __construct()
     {
-        $this->setLastExecution(new DateTime());
         $this->setLocked(false);
         $this->setAutoLocked(false);
     }
@@ -324,7 +323,7 @@ class ScheduledCommand
     }
 
     /**
-     * @param $executeImmediately
+     * @param bool|null $executeImmediately
      * @return ScheduledCommand
      */
     public function setExecuteImmediately($executeImmediately): self

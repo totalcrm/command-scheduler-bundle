@@ -27,9 +27,9 @@ class UnlockCommand extends Command
     
     private EntityManager $em;
     private int $defaultLockTimeout;
-    private int $lockTimeout;
-    private bool $unlockAll;
-    private string $scheduledCommandName;
+    private ?int $lockTimeout = null;
+    private ?bool $unlockAll = false;
+    private ?string $scheduledCommandName = '';
 
     /**
      * UnlockCommand constructor.
@@ -66,9 +66,8 @@ class UnlockCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->unlockAll = $input->getOption('all');
         $this->scheduledCommandName = $input->getArgument('name');
-
+        $this->unlockAll = $input->getOption('all');
         $this->lockTimeout = $input->getOption('lock-timeout') ?: null;
 
         if (null === $this->lockTimeout) {
@@ -90,13 +89,17 @@ class UnlockCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
+<<<<<<< HEAD
             $output->writeln('The command is already running in another process.');
+=======
+            $output->writeln(date('Y-m-d H:i:s') . ' <error>The command is already running in another process</error>');
+>>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
 
             return Command::SUCCESS;
         }
         
         if (false === $this->unlockAll && null === $this->scheduledCommandName) {
-            $output->writeln('Either the name of a scheduled command or the --all option must be set.');
+            $output->writeln(date('Y-m-d H:i:s') . ' <error>Either the name of a scheduled command or the --all option must be set</error>');
 
             return Command::SUCCESS;
         }
@@ -105,17 +108,23 @@ class UnlockCommand extends Command
         $repository = $this->em->getRepository(ScheduledCommand::class);
 
         if (true === $this->unlockAll) {
+            /** @var ScheduledCommand[] $failedCommands */
             $failedCommands = $repository->findLockedCommand();
+            if (!$failedCommands) {
+                $output->writeln(date('Y-m-d H:i:s') . ' <info>Nothing Scheduled Command lock</info>');
+
+                return Command::SUCCESS;
+            }
             foreach ($failedCommands as $failedCommand) {
                 $this->unlock($failedCommand, $output);
             }
         } else {
             /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $repository->findOneBy(['name' => $this->scheduledCommandName, 'disabled' => false]);
-            if (null === $scheduledCommand) {
+            if (!$scheduledCommand instanceof ScheduledCommand) {
                 $output->writeln(
                     sprintf(
-                        'Error: Scheduled Command with name "%s" not found or is disabled.',
+                        date('Y-m-d H:i:s') . ' <error>Error: Scheduled Command with name "%s" not found or is disabled</error>',
                         $this->scheduledCommandName
                     )
                 );
@@ -140,7 +149,7 @@ class UnlockCommand extends Command
     protected function unlock(ScheduledCommand $command, OutputInterface $output): ?bool
     {
         if (false === $command->isLocked()) {
-            $output->writeln(sprintf('Skipping: Scheduled Command "%s" is not locked.', $command->getName()));
+            $output->writeln(sprintf(date('Y-m-d H:i:s') . ' <info>Skipping: Scheduled Command "%s" is not locked</info>', $command->getName()));
 
             return false;
         }
@@ -152,13 +161,16 @@ class UnlockCommand extends Command
             )
         ) {
             $output->writeln(
-                sprintf('Skipping: Timout for scheduled Command "%s" has not run out.', $command->getName())
+                sprintf(date('Y-m-d H:i:s') . ' <info>Skipping: Timout for scheduled Command "%s" has not run out</info>', $command->getName())
             );
 
             return false;
         }
+
         $command->setLocked(false);
-        $output->writeln(sprintf('Scheduled Command "%s" has been unlocked.', $command->getName()));
+        $this->em->persist($command);
+
+        $output->writeln(sprintf(date('Y-m-d H:i:s') . ' <info>Scheduled Command "%s" has been unlocked</info>', $command->getName()));
 
         return true;
     }

@@ -90,10 +90,14 @@ class ExecuteCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $output->writeln('<info>Start : '.($this->dumpMode ? 'Dump' : 'Execute').' all scheduled command</info>');
+        $output->writeln(date('Y-m-d H:i:s') . ' <info>Start</info>: ' . ($this->dumpMode ? 'Dump' : 'Execute') . ' all scheduled command');
 
         if (false !== $this->logPath && 0 !== strpos($this->logPath, 'gaufrette:') && false === is_writable($this->logPath)) {
+<<<<<<< HEAD
             $output->writeln('<error>' . $this->logPath . ' not found or not writable. You should override `log_path` in your config.yml</error>');
+=======
+            $output->writeln(date('Y-m-d H:i:s') . ' <error>' . $this->logPath . ' not found or not writable. You should override `log_path` in your config.yml</error>');
+>>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
 
             return Command::FAILURE;
         }
@@ -103,7 +107,7 @@ class ExecuteCommand extends Command
         /** @var ScheduledCommand[] $commands */
         $commands = $commandRepository->findEnabledCommand();
 
-        $noneExecution = true;
+        $countExecution = 0;
         /** @var ScheduledCommand $command */
         foreach ($commands as $command) {
 
@@ -113,21 +117,36 @@ class ExecuteCommand extends Command
                 continue;
             }
 
-            /** @var CronExpression $cron */
-            $cron = new CronExpression($command->getCronExpression());
-            $nextRunDate = $cron->getNextRunDate($command->getLastExecution());
             $now = new DateTime();
+            try {
+                /** @var CronExpression $cron */
+                $cron = new CronExpression($command->getCronExpression());
+                $nextRunDate = $cron->getNextRunDate($command->getLastExecution());
+            } catch (\Exception $e) {
+                $output->writeln(date('Y-m-d H:i:s') . ' <info>Error</info>: <comment>' . $command->getId() . '. ' . $command->getCommand() . '</comment> <error>' . trim($e->getMessage()). '</error>');
+                $nextRunDate = $now;
+            }
 
             if ($command->isExecuteImmediately()) {
+<<<<<<< HEAD
                 $noneExecution = false;
                 $output->writeln('Immediately execution asked for : <comment>'.$command->getCommand().'</comment>');
+=======
+                ++$countExecution;
+                $output->writeln(date('Y-m-d H:i:s') . ' <info>Immediately execution</info>: <comment>' . $command->getId() . '. ' . $command->getCommand() . '</comment>');
+>>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
 
                 if (!$input->getOption('dump')) {
                     $this->executeCommand($command, $output, $input);
                 }
             } else if ($nextRunDate < $now) {
+<<<<<<< HEAD
                 $noneExecution = false;
                 $output->writeln('Command <comment>' . $command->getCommand() . '</comment> should be executed - last execution : <comment>' . $command->getLastExecution()->format(DateTimeInterface::ATOM) . '.</comment>'
+=======
+                ++$countExecution;
+                $output->writeln(date('Y-m-d H:i:s') . ' <info>Command</info>: <comment>' . $command->getId() . '. ' . $command->getCommand() . '</comment> should be executed - last execution : <comment>' . $command->getLastExecution()->format(DateTimeInterface::ATOM) . '.</comment>'
+>>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
                 );
 
                 if (!$input->getOption('dump')) {
@@ -136,8 +155,10 @@ class ExecuteCommand extends Command
             }
         }
 
-        if (true === $noneExecution) {
-            $output->writeln('Nothing to do.');
+        if (!$countExecution) {
+            $output->writeln(date('Y-m-d H:i:s') . ' <info>Stop</info>: Nothing execute commands');
+        } else {
+            $output->writeln(date('Y-m-d H:i:s') . ' <info>Stop</info>: Executed commands count - <info>' . $countExecution . '</info>');
         }
 
         return Command::SUCCESS;
@@ -172,8 +193,11 @@ class ExecuteCommand extends Command
 
             /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $commandRepository->find($scheduledCommandId);
-            $scheduledCommand->setLastExecution(new DateTime());
-            $scheduledCommand->setLocked(true);
+            $scheduledCommand
+                ->setLastExecution(new DateTime())
+                ->setExecuteImmediately(false)
+                ->setLocked(true)
+            ;
 
             $this->em->persist($scheduledCommand);
             $this->em->flush();
@@ -184,7 +208,7 @@ class ExecuteCommand extends Command
             $this->em->getConnection()->rollBack();
             $output->writeln(
                 sprintf(
-                    '<error>Command %s is locked %s</error>',
+                    date('Y-m-d H:i:s') . ' <error>Command %s is locked %s</error>',
                     $scheduledCommand->getCommand(),
                     (!empty($e->getMessage()) ? sprintf('(%s)', $e->getMessage()) : '')
                 )
@@ -218,7 +242,7 @@ class ExecuteCommand extends Command
             $this->em->persist($scheduledCommand);
             $this->em->flush();
 
-            $output->writeln('<error>Cannot find '.$scheduledCommand->getCommand().'</error>');
+            $output->writeln(date('Y-m-d H:i:s') . ' <error>Cannot find '.$scheduledCommand->getCommand().'</error>');
 
             return;
         }
@@ -252,7 +276,7 @@ class ExecuteCommand extends Command
         }
 
         try {
-            $output->writeln('<info>Execute</info> : <comment>'.$scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
+            $output->writeln(date('Y-m-d H:i:s') . ' <info>Execute</info>: <comment>' . $scheduledCommand->getId() . '. ' . $scheduledCommand->getCommand() . ' ' . $scheduledCommand->getArguments() . '</comment>');
             $result = $command->run($input, $logBufferedOutput);
 
         } catch (\Exception $e) {
@@ -264,7 +288,7 @@ class ExecuteCommand extends Command
         }
 
         if (false === $this->em->isOpen()) {
-            $output->writeln('<comment>Entity manager closed by the last command.</comment>');
+            $output->writeln(date('Y-m-d H:i:s') . ' <comment>Entity manager closed by the last command.</comment>');
             $this->em = $this->em->create($this->em->getConnection(), $this->em->getConfiguration());
         }
 
@@ -276,7 +300,6 @@ class ExecuteCommand extends Command
         $scheduledCommand
             ->setLastMessages($messages)
             ->setLastReturnCode((int)$result)
-            ->setExecuteImmediately(false)
             ->setLocked(false)
         ;
         $this->em->persist($scheduledCommand);
