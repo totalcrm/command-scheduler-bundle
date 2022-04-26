@@ -181,6 +181,7 @@ class ExecuteCommand extends Command
             $scheduledCommand = $commandRepository->find($scheduledCommandId);
             $scheduledCommand
                 ->setLastStart(new DateTime())
+                ->setLastFinish(null)
                 ->setExecuteImmediately(false)
                 ->setLocked(true)
             ;
@@ -251,7 +252,7 @@ class ExecuteCommand extends Command
             /** @var StreamOutput $logStreamOutput */
             $logOutput = new StreamOutput(
                 fopen(
-                    $this->logPath.$scheduledCommand->getLogFile(),
+                    $this->logPath . $scheduledCommand->getLogFile(),
                     'a',
                     false
                 ), $this->commandsVerbosity
@@ -285,6 +286,7 @@ class ExecuteCommand extends Command
         $scheduledCommand = $commandRepository->find($scheduledCommandId);
         $scheduledCommand
             ->setLastMessages($messages)
+            ->setLastFinish(new DateTime())
             ->setLastReturnCode((int)$result)
             ->setLocked(false)
         ;
@@ -293,12 +295,14 @@ class ExecuteCommand extends Command
         if ($scheduledCommand->isHistory() && $scheduledHistoryId) {
             /** @var ScheduledHistory $scheduledHistory */
             $scheduledHistory = $scheduledHistoryRepository->find($scheduledHistoryId);
-            $scheduledHistory
-                ->setDateExecution(new DateTime())
-                ->setReturnCode($result)
-                ->setMessages($messages)
-            ;
-            $this->em->persist($scheduledHistory);
+            if ($scheduledHistory instanceof ScheduledHistory) {
+                $scheduledHistory
+                    ->setDateFinish(new DateTime())
+                    ->setReturnCode($result)
+                    ->setMessages($messages)
+                ;
+                $this->em->persist($scheduledHistory);
+            }
         }
 
         $this->em->flush();

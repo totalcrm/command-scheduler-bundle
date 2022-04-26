@@ -39,7 +39,7 @@ class ScheduledHistory
     /**
      * @var DateTime|null
      */
-    private $dateExecution;
+    private $dateFinish;
 
     /**
      * @var int|null
@@ -115,7 +115,7 @@ class ScheduledHistory
     /**
      * @return DateTime|null
      */
-    public function getDateStart(): ?DateTime
+    public function getLastStart(): ?DateTime
     {
         return $this->dateStart;
     }
@@ -134,18 +134,18 @@ class ScheduledHistory
     /**
      * @return DateTime|null
      */
-    public function getDateExecution(): ?DateTime
+    public function getDateFinish(): ?DateTime
     {
-        return $this->dateExecution;
+        return $this->dateFinish;
     }
 
     /**
-     * @param DateTime|null $dateExecution
+     * @param DateTime|null $dateFinish
      * @return ScheduledHistory
      */
-    public function setDateExecution(?DateTime $dateExecution)
+    public function setLastFinish(?DateTime $dateFinish)
     {
-        $this->dateExecution = $dateExecution;
+        $this->dateFinish = $dateFinish;
 
         return $this;
     }
