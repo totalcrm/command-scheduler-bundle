@@ -143,7 +143,7 @@ class ScheduledHistory
      * @param DateTime|null $dateFinish
      * @return ScheduledHistory
      */
-    public function setLastFinish(?DateTime $dateFinish)
+    public function setDateFinish(?DateTime $dateFinish)
     {
         $this->dateFinish = $dateFinish;
 
