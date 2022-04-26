@@ -87,6 +87,11 @@ class ScheduledCommand
     private $locked;
 
     /**
+     * @var bool|null
+     */
+    private $autoLocked;
+
+    /**
      * @var int|null
      */
     private $userId;
@@ -109,6 +114,7 @@ class ScheduledCommand
     {
         $this->setLastExecution(new DateTime());
         $this->setLocked(false);
+        $this->setAutoLocked(false);
     }
 
     /**
@@ -381,7 +387,34 @@ class ScheduledCommand
 
         return $this;
     }
+    
+    /**
+     * @return bool|null
+     */
+    public function isAutoLocked(): ?bool
+    {
+        return $this->autoLocked;
+    }
 
+    /**
+     * @return bool|null
+     */
+    public function getAutoLocked(): ?bool
+    {
+        return $this->autoLocked;
+    }
+
+    /**
+     * @param bool|null $autoLocked
+     * @return ScheduledCommand
+     */
+    public function setAutoLocked(?bool $autoLocked): self
+    {
+        $this->autoLocked = $autoLocked;
+
+        return $this;
+    }
+    
     /**
      * @return int|null
      */

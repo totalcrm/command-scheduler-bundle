@@ -7,6 +7,7 @@ use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Exception;
+use Symfony\Component\Console\Command\LockableTrait;
 use TotalCRM\CommandScheduler\Entity\Repository\ScheduledCommandRepository;
 use TotalCRM\CommandScheduler\Entity\ScheduledCommand;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -22,6 +23,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UnlockCommand extends Command
 {
+    use LockableTrait;
+    
     private EntityManager $em;
     private int $defaultLockTimeout;
     private int $lockTimeout;
@@ -86,6 +89,12 @@ class UnlockCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->lock()) {
+            $output->writeln('The command is already running in another process.');
+
+            return Command::SUCCESS;
+        }
+        
         if (false === $this->unlockAll && null === $this->scheduledCommandName) {
             $output->writeln('Either the name of a scheduled command or the --all option must be set.');
 
@@ -116,18 +125,19 @@ class UnlockCommand extends Command
             $this->unlock($scheduledCommand, $output);
         }
         $this->em->flush();
+        
+        $this->release();
 
         return Command::SUCCESS;
     }
 
     /**
-     * @param ScheduledCommand $command command to be unlocked
-     *
+     * @param ScheduledCommand $command 
      * @param OutputInterface $output
-     * @return bool true if unlock happened
+     * @return bool|null
      * @throws Exception
      */
-    protected function unlock(ScheduledCommand $command, OutputInterface $output)
+    protected function unlock(ScheduledCommand $command, OutputInterface $output): ?bool
     {
         if (false === $command->isLocked()) {
             $output->writeln(sprintf('Skipping: Scheduled Command "%s" is not locked.', $command->getName()));

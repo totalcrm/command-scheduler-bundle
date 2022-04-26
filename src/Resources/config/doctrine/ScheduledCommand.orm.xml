@@ -21,6 +21,7 @@
         <field name="executeImmediately" column="execute_immediately" type="boolean" nullable="true" unique="false" />
         <field name="disabled" column="disabled" type="boolean" nullable="true" unique="false" />
         <field name="locked" column="locked" type="boolean" nullable="true" unique="false" />
+        <field name="autoLocked" column="auto_locked" type="boolean" nullable="true" unique="false" />
         <field name="userId" column="user_id" type="integer" nullable="true" unique="false" />
         <field name="createdAt" column="created_at" type="datetime" nullable="true" unique="false" />
         <field name="updatedAt" column="updated_at" type="datetime" nullable="true" unique="false" />
