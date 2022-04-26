@@ -147,7 +147,8 @@ easy_admin:
           - { property: 'name', label: 'detail.name' }
           - { property: 'command', label: 'detail.command' }
           - { property: 'arguments', label: 'detail.arguments' }
-          - { property: 'lastExecution', label: 'detail.lastExecution' }
+          - { property: 'lastStart', label: 'detail.lastStart' }
+          - { property: 'lastFinish', label: 'detail.lastFinish' }
           - { property: 'lastReturncode', label: 'detail.lastReturnCode' }
           - { property: 'locked', label: 'detail.locked', type: boolean}
           - { property: 'priority', label: 'detail.priority' }

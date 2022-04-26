@@ -89,17 +89,14 @@ class UnlockCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
-<<<<<<< HEAD
-            $output->writeln('The command is already running in another process.');
-=======
             $output->writeln(date('Y-m-d H:i:s') . ' <error>The command is already running in another process</error>');
->>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
 
             return Command::SUCCESS;
         }
         
         if (false === $this->unlockAll && null === $this->scheduledCommandName) {
             $output->writeln(date('Y-m-d H:i:s') . ' <error>Either the name of a scheduled command or the --all option must be set</error>');
+            $this->release();
 
             return Command::SUCCESS;
         }
@@ -112,6 +109,7 @@ class UnlockCommand extends Command
             $failedCommands = $repository->findLockedCommand();
             if (!$failedCommands) {
                 $output->writeln(date('Y-m-d H:i:s') . ' <info>Nothing Scheduled Command lock</info>');
+                $this->release();
 
                 return Command::SUCCESS;
             }
@@ -128,6 +126,7 @@ class UnlockCommand extends Command
                         $this->scheduledCommandName
                     )
                 );
+                $this->release();
 
                 return Command::SUCCESS;
             }
@@ -155,8 +154,8 @@ class UnlockCommand extends Command
         }
 
         if (false !== $this->lockTimeout &&
-            null !== $command->getLastExecution() &&
-            $command->getLastExecution() >= (new DateTime())->sub(
+            null !== $command->getLastStart() &&
+            $command->getLastStart() >= (new DateTime())->sub(
                 new DateInterval(sprintf('PT%dS', $this->lockTimeout))
             )
         ) {

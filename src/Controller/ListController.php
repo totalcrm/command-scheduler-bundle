@@ -145,7 +145,7 @@ class ListController extends BaseController
             $results[$command->getId()] = [
                 'lastReturnCode' => $command->getLastReturnCode(),
                 'locked' => $command->getLocked() ? 'true' : 'false',
-                'lastExecution' => $command->getLastExecution(),
+                'lastStart' => $command->getLastStart(),
             ];
         }
 

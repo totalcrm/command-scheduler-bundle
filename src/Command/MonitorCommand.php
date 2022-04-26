@@ -95,7 +95,7 @@ class MonitorCommand extends Command
                     $command->getName(),
                     $command->getLastReturnCode(),
                     $command->getLocked(),
-                    $command->getLastExecution()->format(DateTimeInterface::ATOM)
+                    $command->getLastStart()->format(DateTimeInterface::ATOM)
                 );
             }
 

@@ -44,7 +44,12 @@ class ScheduledCommand
     /**
      * @var DateTime|null
      */
-    private $lastExecution;
+    private $lastStart;
+
+    /**
+     * @var DateTime|null
+     */
+    private $lastFinish;
 
     /**
      * @var int|null
@@ -229,22 +234,41 @@ class ScheduledCommand
 
         return $this;
     }
-
+    
     /**
      * @return DateTime|null
      */
-    public function getLastExecution(): ?DateTime
+    public function getLastStart(): ?DateTime
     {
-        return $this->lastExecution;
+        return $this->lastStart;
     }
 
     /**
-     * @param DateTime|null $lastExecution
+     * @param DateTime|null $lastStart
      * @return ScheduledCommand
      */
-    public function setLastExecution($lastExecution): self
+    public function setLastStart($lastStart): self
     {
-        $this->lastExecution = $lastExecution;
+        $this->lastStart = $lastStart;
+
+        return $this;
+    }
+    
+    /**
+     * @return DateTime|null
+     */
+    public function getLastFinish(): ?DateTime
+    {
+        return $this->lastFinish;
+    }
+
+    /**
+     * @param DateTime|null $lastFinish
+     * @return ScheduledCommand
+     */
+    public function setLastFinish($lastFinish): self
+    {
+        $this->lastFinish = $lastFinish;
 
         return $this;
     }

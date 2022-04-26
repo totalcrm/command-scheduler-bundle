@@ -21,15 +21,9 @@ class ScheduledCommandRepository extends EntityRepository
     {
         $query = $this
             ->createQueryBuilder('command')
-<<<<<<< HEAD
-            ->andWhere('command.disabled = false')
-            ->andWhere('command.locked = false OR command.autoLocked = true')
-            ->orderBy('priority', 'DESC')
-=======
             ->andWhere('command.disabled = false AND (command.locked = false OR command.autoLocked = true)')
             ->orWhere('command.executeImmediately = 1')
             ->orderBy('command.priority', 'DESC')
->>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
             ->getQuery()
             ->getResult()
         ;
@@ -55,11 +49,7 @@ class ScheduledCommandRepository extends EntityRepository
             ->andWhere('command.disabled = false')
             ->andWhere('command.locked = true')
             ->andWhere('command.autoLocked = false')
-<<<<<<< HEAD
-            ->orderBy('priority', 'DESC')
-=======
             ->orderBy('command.priority', 'DESC')
->>>>>>> e6cd6f08bc2a017935b1f3b086c2ec47cff00f54
             ->getQuery()
             ->getResult()
         ;
@@ -94,7 +84,7 @@ class ScheduledCommandRepository extends EntityRepository
             $lockedCommands = $this->findLockedCommand();
             foreach ($lockedCommands as $lockedCommand) {
                 $now = time();
-                if ($lockedCommand->getLastExecution()->getTimestamp() + $lockTimeout < $now) {
+                if ($lockedCommand->getLastStart()->getTimestamp() + $lockTimeout < $now) {
                     $failedCommands[] = $lockedCommand;
                 }
             }
