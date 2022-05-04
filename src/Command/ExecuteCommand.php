@@ -172,19 +172,21 @@ class ExecuteCommand extends Command
         try {
             /** @var ScheduledCommand $notLockedCommand */
             $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommandId);
-
             if (!$notLockedCommand instanceof ScheduledCommand) {
-                throw new \Exception();
+                return;
             }
 
             /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $commandRepository->find($scheduledCommandId);
+            if (!$scheduledCommand instanceof ScheduledCommand) {
+                return;
+            }
+
             $scheduledCommand
                 ->setLastStart(new DateTime())
                 ->setLastFinish(null)
                 ->setExecuteImmediately(false)
-                ->setLocked(true)
-            ;
+                ->setLocked(true);
 
             $this->em->persist($scheduledCommand);
             $this->em->flush();
@@ -204,19 +206,20 @@ class ExecuteCommand extends Command
             return;
         }
 
-        /** @var ScheduledCommand $scheduledCommand */
+        /** @var ScheduledCommand|null $scheduledCommand */
         $scheduledCommand = $commandRepository->find($scheduledCommandId);
-        $scheduledHistory = null;
+
+        if (!$scheduledCommand instanceof ScheduledCommand) {
+            return;
+        }
 
         if ($scheduledCommand->isHistory()) {
             $scheduledHistory = new ScheduledHistory();
             $scheduledHistory
                 ->setDateStart(new DateTime())
-                ->setCommandId($scheduledCommandId)
-            ;
+                ->setCommandId($scheduledCommandId);
             $this->em->persist($scheduledHistory);
             $this->em->flush();
-
             $scheduledHistoryId = $scheduledHistory->getId();
         }
 
@@ -284,28 +287,28 @@ class ExecuteCommand extends Command
 
         /** @var ScheduledCommand $scheduledCommand */
         $scheduledCommand = $commandRepository->find($scheduledCommandId);
-        $scheduledCommand
-            ->setLastMessages($messages)
-            ->setLastFinish(new DateTime())
-            ->setLastReturnCode((int)$result)
-            ->setLocked(false)
-        ;
-        $this->em->persist($scheduledCommand);
+        if ($scheduledCommand instanceof ScheduledCommand) {
+            $scheduledCommand
+                ->setLastMessages($messages)
+                ->setLastFinish(new DateTime())
+                ->setLastReturnCode((int)$result)
+                ->setLocked(false);
+            $this->em->persist($scheduledCommand);
 
-        if ($scheduledCommand->isHistory() && $scheduledHistoryId) {
-            /** @var ScheduledHistory $scheduledHistory */
-            $scheduledHistory = $scheduledHistoryRepository->find($scheduledHistoryId);
-            if ($scheduledHistory instanceof ScheduledHistory) {
-                $scheduledHistory
-                    ->setDateFinish(new DateTime())
-                    ->setReturnCode($result)
-                    ->setMessages($messages)
-                ;
-                $this->em->persist($scheduledHistory);
+            if ($scheduledCommand->isHistory() && $scheduledHistoryId) {
+                /** @var ScheduledHistory $scheduledHistory */
+                $scheduledHistory = $scheduledHistoryRepository->find($scheduledHistoryId);
+                if ($scheduledHistory instanceof ScheduledHistory) {
+                    $scheduledHistory
+                        ->setDateFinish(new DateTime())
+                        ->setReturnCode($result)
+                        ->setMessages($messages);
+                    $this->em->persist($scheduledHistory);
+                }
             }
-        }
 
-        $this->em->flush();
+            $this->em->flush();
+        }
 
         try {
             $this->em->clear();
