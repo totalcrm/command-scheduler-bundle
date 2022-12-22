@@ -11,21 +11,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class CommandSchedulerBundle extends Bundle
 {
-    /**
-     * @return CommandSchedulerExtension
-     */
-    public function getContainerExtension()
-    {
-        $class = $this->getContainerExtensionClass();
-
-        return new $class();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getContainerExtensionClass()
-    {
-        return CommandSchedulerExtension::class;
-    }
 }

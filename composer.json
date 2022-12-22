@@ -12,16 +12,16 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": ">=7.4.0",
         "doctrine/orm": "^2.5.11",
         "doctrine/doctrine-bundle": "^1.6.10|^2.0",
         "dragonmantank/cron-expression": "^3.0",
-        "symfony/console": "^5.0",
-        "symfony/framework-bundle": "^5.0",
-        "symfony/form": "^5.0",
-        "symfony/validator": "^5.0",
-        "symfony/serializer": "^5.0",
-        "symfony/lock": "^5.0",
+        "symfony/console": ">=5.0.0",
+        "symfony/framework-bundle": ">=5.0.0",
+        "symfony/form": ">=5.0.0",
+        "symfony/validator": ">=5.0.0",
+        "symfony/serializer": ">=5.0.0",
+        "symfony/lock": ">=5.0.0",
         "ext-simplexml": "*",
         "ext-json": "*",
         "ext-pcntl": "*"
@@ -32,8 +32,8 @@
         "php-coveralls/php-coveralls": "^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.0.0",
         "liip/functional-test-bundle": "^4.2",
-        "symfony/css-selector": "^5.0",
-        "symfony/security-bundle": "^5.0",
+        "symfony/css-selector": ">=5.0.0",
+        "symfony/security-bundle": ">=5.0.0",
         "liip/test-fixtures-bundle": "^1.4.0"
     },
     "suggest": {

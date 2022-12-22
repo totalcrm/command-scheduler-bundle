@@ -30,12 +30,4 @@ class CommandSchedulerExtension extends Extension
             $container->setParameter('totalcrm_command_scheduler.'.$key, $value);
         }
     }
-
-    /**
-     * @return string
-     */
-    public function getAlias()
-    {
-        return 'totalcrm_command_scheduler';
-    }
 }
