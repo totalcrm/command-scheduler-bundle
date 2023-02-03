@@ -109,7 +109,7 @@ class ExecuteCommand extends Command
 
             $command = $commandRepository->find($command->getId());
 
-            if ($command->isDisabled() || $command->isLocked()) {
+            if ($command->isDisabled()) {
                 continue;
             }
 
@@ -170,12 +170,6 @@ class ExecuteCommand extends Command
         $this->em->getConnection()->beginTransaction();
         
         try {
-            /** @var ScheduledCommand $notLockedCommand */
-            $notLockedCommand = $commandRepository->getNotLockedCommand($scheduledCommandId);
-            if (!$notLockedCommand instanceof ScheduledCommand) {
-                return;
-            }
-
             /** @var ScheduledCommand $scheduledCommand */
             $scheduledCommand = $commandRepository->find($scheduledCommandId);
             if (!$scheduledCommand instanceof ScheduledCommand) {
@@ -185,8 +179,7 @@ class ExecuteCommand extends Command
             $scheduledCommand
                 ->setLastStart(new DateTime())
                 ->setLastFinish(null)
-                ->setExecuteImmediately(false)
-                ->setLocked(true);
+                ->setExecuteImmediately(false);
 
             $this->em->persist($scheduledCommand);
             $this->em->flush();
